@@ -454,7 +454,6 @@ async function verifyStudent() {
   try {
     const response = await fetch(url, {
       method: 'GET',
-      mode: 'cors',  // BẮT BUỘC
       headers: {
         'Content-Type': 'application/json'
       }
@@ -750,7 +749,6 @@ async function submitTest() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(dataToSend),
-      mode: 'cors',  // ✅ Thêm mode: 'cors' để enable CORS
       credentials: 'omit'  // Không gửi cookie nếu không cần
     });
         
