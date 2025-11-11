@@ -706,52 +706,75 @@ async function submitTest() {
     }).length / requiredFields.length) * 100);
     
     // Data to send
-    const dataToSend = {
-        timestamp: new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }),
-        studentCode: studentInfo.code,
-        studentName: studentInfo.name,
-        weekNumber: WEEK_NUMBER,
-        
-        // Topic 1
-        topic1_ss: answers.t1_ss,
-        topic1_is: answers.t1_is,
-        topic1_q: answers.t1_q,
-        topic1_t: answers.t1_t,
-        topic1_body1: answers.t1_body1,
-        topic1_body2: answers.t1_body2,
-        topic1_body3: answers.t1_body3,
-        topic1_intro: answers.t1_intro,
-        topic1_words: t1IntroWords,
-        
-        // Topic 2
-        topic2_ss: answers.t2_ss,
-        topic2_is: answers.t2_is,
-        topic2_q: answers.t2_q,
-        topic2_t: answers.t2_t,
-        topic2_body1: answers.t2_body1,
-        topic2_body2: answers.t2_body2,
-        topic2_body3: answers.t2_body3,
-        topic2_intro: answers.t2_intro,
-        topic2_words: t2IntroWords,
-        
-        // Statistics
-        totalWords: totalWords,
-        timeUsed: timeUsedDisplay,
-        timeUsedSeconds: elapsedSeconds,
-        completionPercent: completionPercent,
-        
-        // Behavior data
-        totalPastes: totalPastes,
-        totalEdits: totalEdits,
-        behaviorData: JSON.stringify(behaviorData),
-        timeBreakdown: JSON.stringify(timeBreakdown),
-        
-        // Detailed logs
-        t1_intro_pastes: behaviorData.t1_intro.pastes,
+  const dataToSend = {
+    studentCode: studentInfo.code,
+    studentName: studentInfo.name,
+    weekNumber: WEEK_NUMBER,
+    examType: 'essay',
+    totalTimeSeconds: elapsedSeconds,
+
+    // === TOPIC 1 ===
+    topic1: {
+        ss: answers.t1_ss || '',
+        is: answers.t1_is || '',
+        q: answers.t1_q || '',
+        t: answers.t1_t || '',
+        body1: answers.t1_body1 || '',
+        body2: answers.t1_body2 || '',
+        body3: answers.t1_body3 || '',  // ← Đảm bảo có
+        introduction: answers.t1_intro || '',
+        wordCount: t1IntroWords,
+        timeSeconds: Math.round((
+            behaviorData.t1_ss.time +
+            behaviorData.t1_is.time +
+            behaviorData.t1_q.time +
+            behaviorData.t1_t.time +
+            behaviorData.t1_body1.time +
+            behaviorData.t1_body2.time +
+            behaviorData.t1_body3.time +
+            behaviorData.t1_intro.time
+        ) / 1000),
+        keystrokeLog: {} // nếu sau này cần log chi tiết hơn
+    },
+
+    // === TOPIC 2 ===
+    topic2: {
+        ss: answers.t2_ss || '',
+        is: answers.t2_is || '',
+        q: answers.t2_q || '',
+        t: answers.t2_t || '',
+        body1: answers.t2_body1 || '',
+        body2: answers.t2_body2 || '',
+        body3: answers.t2_body3 || '',  // ← Đảm bảo có
+        introduction: answers.t2_intro || '',
+        wordCount: t2IntroWords,
+        timeSeconds: Math.round((
+            behaviorData.t2_ss.time +
+            behaviorData.t2_is.time +
+            behaviorData.t2_q.time +
+            behaviorData.t2_t.time +
+            behaviorData.t2_body1.time +
+            behaviorData.t2_body2.time +
+            behaviorData.t2_body3.time +
+            behaviorData.t2_intro.time
+        ) / 1000),
+        keystrokeLog: {}
+    },
+
+    // === THỐNG KÊ & HÀNH VI (GIỮ NGUYÊN) ===
+    totalPastes: totalPastes,
+    totalEdits: totalEdits,
+    behaviorData: behaviorData,           // ← Object đầy đủ 16 field
+    timeBreakdown: timeBreakdown,         // ← Thời gian từng phần (giây)
+
+    // === DETAILED LOGS (nếu muốn giữ riêng) ===
+    detailedLogs: {
         t1_intro_edits: behaviorData.t1_intro.edits,
-        t2_intro_pastes: behaviorData.t2_intro.pastes,
-        t2_intro_edits: behaviorData.t2_intro.edits
-    };
+        t1_intro_pastes: behaviorData.t1_intro.pastes,
+        t2_intro_edits: behaviorData.t2_intro.edits,
+        t2_intro_pastes: behaviorData.t2_intro.pastes
+    }
+};
     
     try {
         await fetch(GOOGLE_SCRIPT_URL, {
