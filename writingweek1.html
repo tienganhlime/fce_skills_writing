@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FCE Writing Week 1 - Trung Tâm Tiếng Anh LIME</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 50%, #81C784 100%);
+        }
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #4CAF50;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .paste-warning {
+            animation: shake 0.5s;
+            border-color: #f44336 !important;
+            background-color: #ffebee !important;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        textarea:focus, input:focus {
+            outline: none;
+            border-color: #4CAF50 !important;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+        }
+    </style>
+</head>
+<body>
+
+<!-- Màn hình nhập mã -->
+<div id="codeScreen" class="min-h-screen p-4 fade-in">
+    <div class="max-w-2xl mx-auto">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 mt-8">
+            <div class="text-center mb-8">
+                <img src="https://gofirst.pro/images/uploads/62/baseimg/logo_16541442053.png" 
+                     alt="LIME Logo" class="w-32 h-32 mx-auto mb-4 object-contain">
+                <h1 class="text-4xl font-bold text-green-700 mb-2">Trung Tâm Tiếng Anh LIME</h1>
+                <p class="text-green-600 text-lg">📞 Hotline: 0976222792</p>
+                <div class="mt-4 h-1 w-32 bg-green-500 mx-auto rounded"></div>
+            </div>
+            
+            <div class="bg-green-50 rounded-xl p-6 mb-6">
+                <h2 class="text-2xl font-bold text-green-800 mb-4">FCE WRITING - WEEK 1</h2>
+                <div class="space-y-2 text-green-700">
+                    <p>✍️ Đề 1: We are much too worried about how people and things look</p>
+                    <p>✍️ Đề 2: Students should help to make decisions about what happens at school</p>
+                    <p>📝 Phân tích đề (SS, IS, Q, T + Outline)</p>
+                    <p>📄 Viết mở bài (50-70 words)</p>
+                    <p>🔍 Hệ thống theo dõi hành vi làm bài</p>
+                </div>
+            </div>
+
+            <div class="bg-yellow-50 border-2 border-yellow-300 rounded-xl p-4 mb-6">
+                <div class="flex items-start gap-2">
+                    <svg class="w-6 h-6 text-yellow-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
+                    <div class="text-yellow-800">
+                        <p class="font-bold mb-1">⚠️ Lưu ý:</p>
+                        <p>• Hệ thống sẽ ghi nhận số lần paste và chỉnh sửa</p>
+                        <p>• Không nên copy từ nguồn khác</p>
+                        <p>• Làm bài trung thực để có kết quả tốt nhất</p>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-green-800 font-semibold mb-2">Mã học sinh *</label>
+                <input type="text" id="studentCode" 
+                    class="w-full px-4 py-3 border-2 border-green-300 rounded-lg uppercase text-lg"
+                    placeholder="Nhập mã học sinh (VD: HS001)">
+            </div>
+
+            <button onclick="verifyStudent()" 
+                class="w-full mt-6 bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-6 rounded-lg transition duration-300 text-lg shadow-lg">
+                XÁC NHẬN & BẮT ĐẦU
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Màn hình làm bài -->
+<div id="testScreen" class="hidden min-h-screen p-4 pb-32">
+    <div class="max-w-5xl mx-auto">
+        <!-- Header -->
+        <div class="bg-white rounded-2xl shadow-2xl p-6 mb-6 sticky top-4 z-10">
+            <div class="flex justify-between items-center flex-wrap gap-4">
+                <div class="flex items-center gap-3">
+                    <img src="https://gofirst.pro/images/uploads/62/baseimg/logo_16541442053.png" 
+                         alt="LIME Logo" class="w-12 h-12 object-contain">
+                    <div>
+                        <h1 class="text-2xl font-bold text-green-700">FCE Writing - Week 1</h1>
+                        <p class="text-green-600 text-sm">Essay Analysis & Introduction</p>
+                    </div>
+                </div>
+                
+                <div class="text-right">
+                    <p class="text-sm text-gray-600">Học sinh: <span id="headerName" class="font-semibold"></span></p>
+                    <p class="text-sm text-gray-600">Mã: <span id="headerCode" class="font-semibold"></span></p>
+                    <p class="text-sm text-gray-600">⏱️ Thời gian: <span id="timerDisplay">00:00</span></p>
+                </div>
+            </div>
+            
+            <div class="mt-4">
+                <div class="flex justify-between text-sm text-gray-600 mb-1">
+                    <span>Tiến độ: <span id="progressCount">0</span>/16 mục</span>
+                    <span id="progressPercent">0%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-3">
+                    <div id="progressBar" class="bg-green-600 h-3 rounded-full transition-all" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TOPIC 1 -->
+        <div class="bg-white rounded-2xl shadow-2xl p-8 mb-6 fade-in">
+            <div class="bg-gradient-to-r from-blue-600 to-blue-500 text-white px-6 py-4 rounded-t-xl -mx-8 -mt-8 mb-6">
+                <h2 class="text-2xl font-bold">📝 ĐỀ 1: APPEARANCE & SOCIETY</h2>
+                <p class="text-sm opacity-90">We are much too worried about how people and things look</p>
+            </div>
+
+            <!-- Đề bài đầy đủ -->
+            <div class="bg-blue-50 border-l-4 border-blue-600 p-5 mb-6 rounded-r-lg">
+                <h3 class="font-bold text-blue-800 mb-3 text-lg">📋 Essay Topic:</h3>
+                <p class="text-blue-900 mb-3 text-lg font-semibold">"We are much too worried about how people and things look. Do you agree?"</p>
+                <p class="text-blue-700 text-sm"><em>Points to consider: being like your friends / the effect of celebrities / your own idea</em></p>
+            </div>
+
+            <!-- Phân tích đề -->
+            <div class="bg-gray-50 rounded-xl p-6 mb-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4 border-b-2 border-green-500 pb-2">PHẦN 1: PHÂN TÍCH ĐỀ BÀI</h3>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">1. SS (Specific Subject): *</label>
+                        <input type="text" id="t1_ss" 
+                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg"
+                            placeholder="Are there any specific subjects?"
+                            data-field="t1_ss">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">2. IS (Independent Subject): *</label>
+                        <input type="text" id="t1_is" 
+                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg"
+                            placeholder="Are there any independent subjects?"
+                            data-field="t1_is">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">3. Q (Question): *</label>
+                        <input type="text" id="t1_q" 
+                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg"
+                            placeholder="What are the questions?"
+                            data-field="t1_q">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">4. T (Tasks): *</label>
+                        <input type="text" id="t1_t" 
+                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg"
+                            placeholder="How many tasks must we address?"
+                            data-field="t1_t">
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">Body 1: *</label>
+                            <input type="text" id="t1_body1" 
+                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg"
+                                placeholder="Idea 1"
+                                data-field="t1_body1">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">Body 2: *</label>
+                            <input type="text" id="t1_body2" 
+                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg"
+                                placeholder="Idea 2"
+                                data-field="t1_body2">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">Body 3: *</label>
+                            <input type="text" id="t1_body3" 
+                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg"
+                                placeholder="Your own idea"
+                                data-field="t1_body3">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Viết mở bài -->
+            <div class="bg-gray-50 rounded-xl p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4 border-b-2 border-green-500 pb-2">PHẦN 2: VIẾT MỞ BÀI</h3>
+                
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Introduction Paragraph: *</label>
+                    <textarea id="t1_intro" rows="8"
+                        class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg resize-vertical"
+                        placeholder="Write your introduction here... (50-70 words recommended)"
+                        data-field="t1_intro"></textarea>
+                    <div class="flex justify-between items-center mt-2">
+                        <div class="text-sm text-gray-600">
+                            <span>✏️ Chỉnh sửa: <span id="t1_intro_edits" class="font-semibold">0</span> lần</span>
+                            <span class="mx-2">|</span>
+                            <span id="t1_intro_paste_warning" class="text-red-600 font-semibold hidden">⚠️ Paste: <span id="t1_intro_pastes">0</span> lần</span>
+                        </div>
+                        <div id="t1_intro_count" class="text-lg font-semibold text-gray-700">Words: 0 / 50-70</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TOPIC 2 -->
+        <div class="bg-white rounded-2xl shadow-2xl p-8 mb-6 fade-in">
+            <div class="bg-gradient-to-r from-purple-600 to-purple-500 text-white px-6 py-4 rounded-t-xl -mx-8 -mt-8 mb-6">
+                <h2 class="text-2xl font-bold">📝 ĐỀ 2: STUDENTS & SCHOOL DECISIONS</h2>
+                <p class="text-sm opacity-90">Students should help to make decisions about what happens at school</p>
+            </div>
+
+            <!-- Đề bài đầy đủ -->
+            <div class="bg-purple-50 border-l-4 border-purple-600 p-5 mb-6 rounded-r-lg">
+                <h3 class="font-bold text-purple-800 mb-3 text-lg">📋 Essay Topic:</h3>
+                <p class="text-purple-900 mb-3 text-lg font-semibold">"Do you think that students should help to make decisions about what happens at school?"</p>
+                <p class="text-purple-700 text-sm"><em>Points to consider: the subject children study / school rules / your own idea</em></p>
+            </div>
+
+            <!-- Phân tích đề -->
+            <div class="bg-gray-50 rounded-xl p-6 mb-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4 border-b-2 border-green-500 pb-2">PHẦN 1: PHÂN TÍCH ĐỀ BÀI</h3>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">1. SS (Specific Subject): *</label>
+                        <input type="text" id="t2_ss" 
+                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg"
+                            placeholder="Are there any specific subjects?"
+                            data-field="t2_ss">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">2. IS (Independent Subject): *</label>
+                        <input type="text" id="t2_is" 
+                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg"
+                            placeholder="Are there any independent subjects?"
+                            data-field="t2_is">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">3. Q (Question): *</label>
+                        <input type="text" id="t2_q" 
+                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg"
+                            placeholder="What are the questions?"
+                            data-field="t2_q">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">4. T (Tasks): *</label>
+                        <input type="text" id="t2_t" 
+                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg"
+                            placeholder="How many tasks must we address?"
+                            data-field="t2_t">
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">Body 1: *</label>
+                            <input type="text" id="t2_body1" 
+                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg"
+                                placeholder="Idea 1"
+                                data-field="t2_body1">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">Body 2: *</label>
+                            <input type="text" id="t2_body2" 
+                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg"
+                                placeholder="Idea 2"
+                                data-field="t2_body2">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">Body 3: *</label>
+                            <input type="text" id="t2_body3" 
+                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg"
+                                placeholder="Your own idea"
+                                data-field="t2_body3">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Viết mở bài -->
+            <div class="bg-gray-50 rounded-xl p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4 border-b-2 border-green-500 pb-2">PHẦN 2: VIẾT MỞ BÀI</h3>
+                
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Introduction Paragraph: *</label>
+                    <textarea id="t2_intro" rows="8"
+                        class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg resize-vertical"
+                        placeholder="Write your introduction here... (50-70 words recommended)"
+                        data-field="t2_intro"></textarea>
+                    <div class="flex justify-between items-center mt-2">
+                        <div class="text-sm text-gray-600">
+                            <span>✏️ Chỉnh sửa: <span id="t2_intro_edits" class="font-semibold">0</span> lần</span>
+                            <span class="mx-2">|</span>
+                            <span id="t2_intro_paste_warning" class="text-red-600 font-semibold hidden">⚠️ Paste: <span id="t2_intro_pastes">0</span> lần</span>
+                        </div>
+                        <div id="t2_intro_count" class="text-lg font-semibold text-gray-700">Words: 0 / 50-70</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="bg-white rounded-2xl shadow-2xl p-8">
+            <div id="warningBox" class="hidden mb-4 p-4 bg-yellow-50 border-2 border-yellow-300 rounded-lg">
+                <p class="text-yellow-800">
+                    ⚠️ Bạn còn <span id="missingCount" class="font-bold">16</span> mục chưa điền!
+                </p>
+            </div>
+            
+            <button onclick="submitTest()" id="submitBtn"
+                class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-6 rounded-lg transition text-xl shadow-lg">
+                🚀 NỘP BÀI
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Màn hình kết quả -->
+<div id="resultScreen" class="hidden min-h-screen p-4">
+    <div class="max-w-5xl mx-auto">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 mt-8 fade-in">
+            <div class="text-center mb-6">
+                <img src="https://gofirst.pro/images/uploads/62/baseimg/logo_16541442053.png" 
+                     alt="LIME Logo" class="w-32 h-32 mx-auto mb-4 object-contain">
+                <h1 class="text-3xl font-bold text-green-700 mb-2">Trung Tâm Tiếng Anh LIME</h1>
+                <p class="text-green-600">📞 Hotline: 0976222792</p>
+            </div>
+
+            <div class="text-center mb-8">
+                <svg class="w-24 h-24 text-green-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <h2 class="text-3xl font-bold text-green-800 mb-4">Nộp bài thành công!</h2>
+                <p class="text-gray-600 text-lg">Giáo viên sẽ chấm và phản hồi sớm nhất</p>
+            </div>
+
+            <!-- Thống kê -->
+            <div class="bg-green-50 rounded-xl p-6 mb-6 border-2 border-green-200">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                    <div>
+                        <p class="text-gray-600">Hoàn thành</p>
+                        <p id="resultCompletion" class="text-3xl font-bold text-green-700">0%</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-600">Thời gian</p>
+                        <p id="resultTime" class="text-2xl font-bold text-green-700">0 phút</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-600">Tổng từ</p>
+                        <p id="resultWords" class="text-2xl font-bold text-blue-700">0</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-600">Paste</p>
+                        <p id="resultPaste" class="text-2xl font-bold text-orange-700">0 lần</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hành vi làm bài -->
+            <div class="bg-blue-50 rounded-xl p-6 mb-6 border-2 border-blue-200">
+                <h3 class="font-bold text-blue-800 mb-4 text-xl">📊 Thống kê hành vi làm bài</h3>
+                <div id="behaviorStats" class="space-y-3 text-blue-900"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <button onclick="location.reload()" 
+                    class="bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-lg transition shadow-lg">
+                    ← Về trang chủ
+                </button>
+                <button onclick="location.reload()" 
+                    class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-lg transition shadow-lg">
+                    Làm bài tiếp →
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ========== CONFIGURATION ==========
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbys85ivncTA0ti4kPb9VkCTYefG_QlkyquBvAfRsd105-yPS6xq97Pp9QN0WwTU3KofEA/exec';
+const WEEK_NUMBER = 1;
+const EXAM_TYPE = 'essay'; // ← Loại đề
+
+// ========== GLOBAL VARIABLES ==========
+let studentInfo = {};
+let startTime;
+let timerInterval;
+let elapsedSeconds = 0;
+
+// Behavior tracking
+let behaviorData = {
+    t1_ss: { edits: 0, pastes: 0, time: 0 },
+    t1_is: { edits: 0, pastes: 0, time: 0 },
+    t1_q: { edits: 0, pastes: 0, time: 0 },
+    t1_t: { edits: 0, pastes: 0, time: 0 },
+    t1_body1: { edits: 0, pastes: 0, time: 0 },
+    t1_body2: { edits: 0, pastes: 0, time: 0 },
+    t1_body3: { edits: 0, pastes: 0, time: 0 },
+    t1_intro: { edits: 0, pastes: 0, time: 0 },
+    t2_ss: { edits: 0, pastes: 0, time: 0 },
+    t2_is: { edits: 0, pastes: 0, time: 0 },
+    t2_q: { edits: 0, pastes: 0, time: 0 },
+    t2_t: { edits: 0, pastes: 0, time: 0 },
+    t2_body1: { edits: 0, pastes: 0, time: 0 },
+    t2_body2: { edits: 0, pastes: 0, time: 0 },
+    t2_body3: { edits: 0, pastes: 0, time: 0 },
+    t2_intro: { edits: 0, pastes: 0, time: 0 }
+};
+
+let fieldTimers = {};
+
+// ========== STUDENT VERIFICATION ==========
+async function verifyStudent() {
+    const code = document.getElementById('studentCode').value.trim().toUpperCase();
+    if (!code) {
+        alert('Vui lòng nhập mã học sinh!');
+        return;
+    }
+    
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<div class="spinner"></div> <span>Đang xác nhận...</span>';
+    
+    try {
+        const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=verify&code=${code}`);
+        const data = await response.json();
+        
+        if (data.exists) {
+            studentInfo = { code: code, name: data.studentName };
+            document.getElementById('codeScreen').classList.add('hidden');
+            document.getElementById('testScreen').classList.remove('hidden');
+            document.getElementById('headerName').textContent = data.studentName;
+            document.getElementById('headerCode').textContent = code;
+            
+            initializeTracking();
+            startTime = new Date();
+            startTimer();
+        } else {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+            alert('❌ Mã học sinh không tồn tại!\n\n📞 Vui lòng liên hệ giáo viên để được hỗ trợ.');
+        }
+    } catch (error) {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+        alert('⚠️ Lỗi kết nối! Vui lòng kiểm tra Internet hoặc liên hệ giáo viên.');
+        console.error('Error:', error);
+    }
+}
+
+// ========== TIMER ==========
+function startTimer() {
+    timerInterval = setInterval(() => {
+        elapsedSeconds++;
+        updateTimerDisplay();
+    }, 1000);
+}
+
+function updateTimerDisplay() {
+    const minutes = Math.floor(elapsedSeconds / 60);
+    const seconds = elapsedSeconds % 60;
+    const display = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    document.getElementById('timerDisplay').textContent = display;
+}
+
+function stopTimer() {
+    if (timerInterval) {
+        clearInterval(timerInterval);
+    }
+}
+
+// ========== BEHAVIOR TRACKING ==========
+function initializeTracking() {
+    // Track all inputs and textareas
+    const fields = document.querySelectorAll('[data-field]');
+    
+    fields.forEach(field => {
+        const fieldId = field.id;
+        let lastValue = '';
+        let typingTimer;
+        
+        // Focus event - start timer
+        field.addEventListener('focus', () => {
+            fieldTimers[fieldId] = Date.now();
+        });
+        
+        // Blur event - calculate time spent
+        field.addEventListener('blur', () => {
+            if (fieldTimers[fieldId]) {
+                const timeSpent = Date.now() - fieldTimers[fieldId];
+                behaviorData[fieldId].time += timeSpent;
+                delete fieldTimers[fieldId];
+            }
+        });
+        
+        // Paste detection
+        field.addEventListener('paste', (e) => {
+            behaviorData[fieldId].pastes++;
+            
+            // Visual warning
+            field.classList.add('paste-warning');
+            setTimeout(() => {
+                field.classList.remove('paste-warning');
+            }, 500);
+            
+            // Update paste counter for textareas
+            if (field.tagName === 'TEXTAREA') {
+                const pasteSpan = document.getElementById(`${fieldId}_pastes`);
+                const pasteWarning = document.getElementById(`${fieldId}_paste_warning`);
+                if (pasteSpan && pasteWarning) {
+                    pasteSpan.textContent = behaviorData[fieldId].pastes;
+                    pasteWarning.classList.remove('hidden');
+                }
+            }
+            
+            console.log(`Paste detected in ${fieldId}: ${behaviorData[fieldId].pastes} times`);
+        });
+        
+        // Edit tracking (significant changes)
+        field.addEventListener('input', () => {
+            clearTimeout(typingTimer);
+            
+            typingTimer = setTimeout(() => {
+                const currentValue = field.value;
+                
+                // Count as edit if significant change (more than 3 chars difference)
+                if (lastValue && Math.abs(currentValue.length - lastValue.length) > 3) {
+                    behaviorData[fieldId].edits++;
+                    
+                    // Update edit counter for textareas
+                    if (field.tagName === 'TEXTAREA') {
+                        const editSpan = document.getElementById(`${fieldId}_edits`);
+                        if (editSpan) {
+                            editSpan.textContent = behaviorData[fieldId].edits;
+                        }
+                    }
+                }
+                
+                lastValue = currentValue;
+                
+                // Update word count for textareas
+                if (field.tagName === 'TEXTAREA') {
+                    updateWordCount(fieldId);
+                }
+                
+                updateProgress();
+            }, 500); // Wait 500ms after typing stops
+        });
+    });
+}
+
+// ========== WORD COUNT ==========
+function updateWordCount(fieldId) {
+    const textarea = document.getElementById(fieldId);
+    const countDiv = document.getElementById(`${fieldId}_count`);
+    
+    if (!textarea || !countDiv) return;
+    
+    const text = textarea.value.trim();
+    const words = text.length > 0 ? text.split(/\s+/).filter(w => w.length > 0).length : 0;
+    
+    countDiv.textContent = `Words: ${words} / 50-70`;
+    
+    // Color coding
+    if (words >= 50 && words <= 70) {
+        countDiv.className = 'text-lg font-semibold text-green-600';
+    } else if (words > 40 && words < 80) {
+        countDiv.className = 'text-lg font-semibold text-yellow-600';
+    } else if (words > 0) {
+        countDiv.className = 'text-lg font-semibold text-red-600';
+    } else {
+        countDiv.className = 'text-lg font-semibold text-gray-700';
+    }
+}
+
+// ========== PROGRESS TRACKING ==========
+function updateProgress() {
+    let filledCount = 0;
+    const requiredFields = [
+        't1_ss', 't1_is', 't1_q', 't1_t', 't1_body1', 't1_body2', 't1_intro',
+        't2_ss', 't2_is', 't2_q', 't2_t', 't2_body1', 't2_body2', 't2_intro'
+    ];
+    
+    requiredFields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (field && field.value.trim().length > 0) {
+            filledCount++;
+        }
+    });
+    
+    // Count optional fields separately
+    const optionalFields = ['t1_body3', 't2_body3'];
+    optionalFields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (field && field.value.trim().length > 0) {
+            filledCount++;
+        }
+    });
+    
+    const totalFields = requiredFields.length + optionalFields.length;
+    const percent = Math.round((filledCount / totalFields) * 100);
+    
+    document.getElementById('progressCount').textContent = filledCount;
+    document.getElementById('progressPercent').textContent = percent + '%';
+    document.getElementById('progressBar').style.width = percent + '%';
+    
+    const missing = totalFields - filledCount;
+    if (missing > 0) {
+        document.getElementById('warningBox').classList.remove('hidden');
+        document.getElementById('missingCount').textContent = missing;
+    } else {
+        document.getElementById('warningBox').classList.add('hidden');
+    }
+}
+
+// ========== SUBMIT TEST ==========
+async function submitTest() {
+    const requiredFields = [
+        't1_ss', 't1_is', 't1_q', 't1_t', 't1_body1', 't1_body2', 't1_body3', 't1_intro',
+        't2_ss', 't2_is', 't2_q', 't2_t', 't2_body1', 't2_body2', 't2_body3', 't2_intro'
+    ];
+    
+    let missingCount = 0;
+    requiredFields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (!field || field.value.trim().length === 0) {
+            missingCount++;
+        }
+    });
+    
+    if (missingCount > 0) {
+        if (!confirm(`Bạn còn ${missingCount} mục bắt buộc chưa điền. Nộp bài?`)) return;
+    }
+    
+    stopTimer();
+    
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<div class="spinner"></div> <span>Đang xử lý...</span>';
+    
+    // Collect data
+   const t1IntroWords = document.getElementById('t1_intro').value.trim().split(/\s+/).filter(w => w.length > 0).length;
+    const t2IntroWords = document.getElementById('t2_intro').value.trim().split(/\s+/).filter(w => w.length > 0).length;
+    
+    const totalPastes = Object.values(behaviorData).reduce((sum, data) => sum + data.pastes, 0);
+    const totalEdits = Object.values(behaviorData).reduce((sum, data) => sum + data.edits, 0);
+    
+    // Chuẩn bị dữ liệu theo CẤU TRÚC MỚI
+    const dataToSend = {
+        examType: EXAM_TYPE,  // ← QUAN TRỌNG: Xác định loại đề
+        weekNumber: WEEK_NUMBER,
+        studentCode: studentInfo.code,
+        studentName: studentInfo.name,
+        totalTimeSeconds: elapsedSeconds,
+        
+        // Topic 1
+        topic1: {
+            ss: document.getElementById('t1_ss').value.trim(),
+            is: document.getElementById('t1_is').value.trim(),
+            q: document.getElementById('t1_q').value.trim(),
+            t: document.getElementById('t1_t').value.trim(),
+            body1: document.getElementById('t1_body1').value.trim(),
+            body2: document.getElementById('t1_body2').value.trim(),
+            body3: document.getElementById('t1_body3').value.trim(),
+            introduction: document.getElementById('t1_intro').value.trim(),
+            wordCount: t1IntroWords,
+            timeSeconds: Math.round((behaviorData.t1_intro.time + behaviorData.t1_ss.time + 
+                                     behaviorData.t1_is.time + behaviorData.t1_q.time + 
+                                     behaviorData.t1_t.time + behaviorData.t1_body1.time + 
+                                     behaviorData.t1_body2.time + behaviorData.t1_body3.time) / 1000),
+            keystrokeLog: {
+                ss: { edits: behaviorData.t1_ss.edits, pastes: behaviorData.t1_ss.pastes },
+                is: { edits: behaviorData.t1_is.edits, pastes: behaviorData.t1_is.pastes },
+                q: { edits: behaviorData.t1_q.edits, pastes: behaviorData.t1_q.pastes },
+                t: { edits: behaviorData.t1_t.edits, pastes: behaviorData.t1_t.pastes },
+                body1: { edits: behaviorData.t1_body1.edits, pastes: behaviorData.t1_body1.pastes },
+                body2: { edits: behaviorData.t1_body2.edits, pastes: behaviorData.t1_body2.pastes },
+                body3: { edits: behaviorData.t1_body3.edits, pastes: behaviorData.t1_body3.pastes },
+                intro: { edits: behaviorData.t1_intro.edits, pastes: behaviorData.t1_intro.pastes, time: behaviorData.t1_intro.time }
+            }
+        },
+        
+        // Topic 2
+        topic2: {
+            ss: document.getElementById('t2_ss').value.trim(),
+            is: document.getElementById('t2_is').value.trim(),
+            q: document.getElementById('t2_q').value.trim(),
+            t: document.getElementById('t2_t').value.trim(),
+            body1: document.getElementById('t2_body1').value.trim(),
+            body2: document.getElementById('t2_body2').value.trim(),
+            body3: document.getElementById('t2_body3').value.trim(),
+            introduction: document.getElementById('t2_intro').value.trim(),
+            wordCount: t2IntroWords,
+            timeSeconds: Math.round((behaviorData.t2_intro.time + behaviorData.t2_ss.time + 
+                                     behaviorData.t2_is.time + behaviorData.t2_q.time + 
+                                     behaviorData.t2_t.time + behaviorData.t2_body1.time + 
+                                     behaviorData.t2_body2.time + behaviorData.t2_body3.time) / 1000),
+            keystrokeLog: {
+                ss: { edits: behaviorData.t2_ss.edits, pastes: behaviorData.t2_ss.pastes },
+                is: { edits: behaviorData.t2_is.edits, pastes: behaviorData.t2_is.pastes },
+                q: { edits: behaviorData.t2_q.edits, pastes: behaviorData.t2_q.pastes },
+                t: { edits: behaviorData.t2_t.edits, pastes: behaviorData.t2_t.pastes },
+                body1: { edits: behaviorData.t2_body1.edits, pastes: behaviorData.t2_body1.pastes },
+                body2: { edits: behaviorData.t2_body2.edits, pastes: behaviorData.t2_body2.pastes },
+                body3: { edits: behaviorData.t2_body3.edits, pastes: behaviorData.t2_body3.pastes },
+                intro: { edits: behaviorData.t2_intro.edits, pastes: behaviorData.t2_intro.pastes, time: behaviorData.t2_intro.time }
+            }
+        },
+        
+        // BEHAVIOR DATA - PHÁT HIỆN GIAN LẬN
+        totalPastes: totalPastes,
+        totalEdits: totalEdits,
+        behaviorData: behaviorData,  // Chi tiết đầy đủ
+        timeBreakdown: Object.keys(behaviorData).reduce((acc, key) => {
+            acc[key] = Math.round(behaviorData[key].time / 1000);
+            return acc;
+        }, {})
+    };
+    
+    console.log('📤 Dữ liệu gửi đi:', dataToSend);
+    
+    try {
+        const response = await fetch(GOOGLE_SCRIPT_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(dataToSend)
+        });
+        
+        const result = await response.json();
+        console.log('📥 Kết quả từ server:', result);
+        
+        if (result.status === 'success') {
+            const completionPercent = Math.round((requiredFields.filter(f => {
+                const field = document.getElementById(f);
+                return field && field.value.trim().length > 0;
+            }).length / requiredFields.length) * 100);
+            
+            const timeUsedMinutes = Math.floor(elapsedSeconds / 60);
+            const timeUsedSeconds = elapsedSeconds % 60;
+            const timeUsedDisplay = `${timeUsedMinutes}p ${timeUsedSeconds}s`;
+            
+            showResults(completionPercent, timeUsedDisplay, t1IntroWords + t2IntroWords, totalPastes, totalEdits);
+        } else {
+            alert('❌ Lỗi: ' + result.message);
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '🚀 NỘP BÀI';
+        }
+        
+    } catch (error) {
+        console.error('❌ Lỗi gửi dữ liệu:', error);
+        alert('⚠️ Có lỗi xảy ra! Vui lòng thử lại hoặc liên hệ giáo viên.');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '🚀 NỘP BÀI';
+    }
+}
+// ========== SHOW RESULTS ==========
+function showResults(completionPercent, timeUsed, totalWords, totalPastes, totalEdits) {
+    document.getElementById('testScreen').classList.add('hidden');
+    document.getElementById('resultScreen').classList.remove('hidden');
+    
+    document.getElementById('resultCompletion').textContent = completionPercent + '%';
+    document.getElementById('resultTime').textContent = timeUsed;
+    document.getElementById('resultWords').textContent = totalWords;
+    document.getElementById('resultPaste').textContent = totalPastes + ' lần';
+    
+    // Behavior stats
+    let behaviorHtml = '';
+    
+    behaviorHtml += `<div class="flex items-center gap-2">
+        <span class="text-2xl">✏️</span>
+        <span>Tổng số lần chỉnh sửa: <strong>${totalEdits}</strong></span>
+    </div>`;
+    
+    behaviorHtml += `<div class="flex items-center gap-2">
+        <span class="text-2xl">📋</span>
+        <span>Tổng số lần paste: <strong>${totalPastes}</strong> ${totalPastes > 5 ? '⚠️ (Nhiều)' : totalPastes > 0 ? '(Bình thường)' : '✅ (Tốt)'}</span>
+    </div>`;
+    
+    // Topic 1 intro stats
+    const t1Words = document.getElementById('t1_intro').value.trim().split(/\s+/).filter(w => w.length > 0).length;
+    behaviorHtml += `<div class="flex items-center gap-2">
+        <span class="text-2xl">📝</span>
+        <span>Đề 1 - Mở bài: <strong>${t1Words} words</strong> | 
+        ${behaviorData.t1_intro.edits} edits | 
+        ${behaviorData.t1_intro.pastes} pastes</span>
+    </div>`;
+    
+    // Topic 2 intro stats
+    const t2Words = document.getElementById('t2_intro').value.trim().split(/\s+/).filter(w => w.length > 0).length;
+    behaviorHtml += `<div class="flex items-center gap-2">
+        <span class="text-2xl">📝</span>
+        <span>Đề 2 - Mở bài: <strong>${t2Words} words</strong> | 
+        ${behaviorData.t2_intro.edits} edits | 
+        ${behaviorData.t2_intro.pastes} pastes</span>
+    </div>`;
+    
+    // Time breakdown
+    const t1Time = Math.round((behaviorData.t1_intro.time + behaviorData.t1_ss.time + behaviorData.t1_is.time + behaviorData.t1_q.time + behaviorData.t1_t.time + behaviorData.t1_body1.time + behaviorData.t1_body2.time + behaviorData.t1_body3.time) / 1000);
+    const t2Time = Math.round((behaviorData.t2_intro.time + behaviorData.t2_ss.time + behaviorData.t2_is.time + behaviorData.t2_q.time + behaviorData.t2_t.time + behaviorData.t2_body1.time + behaviorData.t2_body2.time + behaviorData.t2_body3.time) / 1000);
+    
+    behaviorHtml += `<div class="flex items-center gap-2">
+        <span class="text-2xl">⏱️</span>
+        <span>Thời gian làm Đề 1: <strong>${Math.floor(t1Time / 60)}p ${t1Time % 60}s</strong></span>
+    </div>`;
+    
+    behaviorHtml += `<div class="flex items-center gap-2">
+        <span class="text-2xl">⏱️</span>
+        <span>Thời gian làm Đề 2: <strong>${Math.floor(t2Time / 60)}p ${t2Time % 60}s</strong></span>
+    </div>`;
+    
+    document.getElementById('behaviorStats').innerHTML = behaviorHtml;
+}
+
+// ========== PREVENT CONTEXT MENU (optional - anti-cheat) ==========
+document.addEventListener('contextmenu', (e) => {
+    if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') {
+        // Allow right-click for spell check
+        return true;
+    }
+});
+
+// ========== AUTO-SAVE (optional) ==========
+setInterval(() => {
+    if (studentInfo.code) {
+        const allFields = Object.keys(behaviorData);
+        const autoSaveData = {};
+        
+        allFields.forEach(fieldId => {
+            const field = document.getElementById(fieldId);
+            if (field) {
+                autoSaveData[fieldId] = field.value;
+            }
+        });
+        
+        localStorage.setItem(`week1_${studentInfo.code}`, JSON.stringify(autoSaveData));
+        console.log('Auto-saved at', new Date().toLocaleTimeString());
+    }
+}, 30000); // Auto-save every 30 seconds
+
+</script>
+
+</body>
+</html>
