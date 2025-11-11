@@ -1,77 +1,1003 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>FCE Writing - Giáo viên</title>
-  <style>
-    body { font-family: Arial; margin: 20px; background: #f5f5f5; }
-    h1 { color: #2196F3; text-align: center; }
-    .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-    select, button { padding: 10px; margin: 10px 0; font-size: 16px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-    th { background: #2196F3; color: white; }
-    tr:nth-child(even) { background: #f9f9f9; }
-    .btn { background: #4CAF50; color: white; border: none; padding: 8px 16px; cursor: pointer; border-radius: 5px; }
-    .btn:hover { background: #45a049; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Dashboard - FCE Writing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 50%, #90CAF9 100%);
+        }
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #2196F3;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .student-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .student-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        }
+        .score-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .score-excellent { background: #4CAF50; color: white; }
+        .score-good { background: #2196F3; color: white; }
+        .score-average { background: #FFC107; color: black; }
+        .score-poor { background: #FF9800; color: white; }
+        .score-fail { background: #F44336; color: white; }
+        
+        .cefr-c1 { background: #4CAF50; color: white; }
+        .cefr-b2 { background: #2196F3; color: white; }
+        .cefr-b1 { background: #FFC107; color: black; }
+        .cefr-a2 { background: #FF9800; color: white; }
+        
+        .editable-feedback {
+            border: 2px dashed #ccc;
+            padding: 12px;
+            border-radius: 8px;
+            background: #FFFEF7;
+            cursor: text;
+        }
+        .editable-feedback:hover {
+            border-color: #2196F3;
+            background: #FFF9E6;
+        }
+        .editable-feedback:focus {
+            outline: none;
+            border-color: #2196F3;
+            border-style: solid;
+        }
+        
+        .tab-button {
+            padding: 12px 24px;
+            border-radius: 8px 8px 0 0;
+            font-weight: 600;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .tab-button.active {
+            background: white;
+            color: #2196F3;
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+        }
+        .tab-button:not(.active) {
+            background: rgba(255,255,255,0.5);
+            color: #666;
+        }
+        .tab-button:not(.active):hover {
+            background: rgba(255,255,255,0.8);
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>FCE Writing - Dashboard Giáo viên</h1>
-    <label>Chọn tuần:</label>
-    <select id="weekSelect">
-      <option value="1">Week 1</option>
-      <option value="2">Week 2</option>
-      <option value="3">Week 3</option>
-    </select>
-    <button onclick="loadSubmissions()">Tải danh sách</button>
 
-    <table id="submissionsTable">
-      <thead>
-        <tr>
-          <th>Thời gian</th>
-          <th>Mã HS</th>
-          <th>Tên</th>
-          <th>Thời gian làm</th>
-          <th>Hành động</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
+<!-- Màn hình Password -->
+<div id="passwordScreen" class="min-h-screen flex items-center justify-center p-4 fade-in">
+    <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full">
+        <div class="text-center mb-8">
+            <img src="https://gofirst.pro/images/uploads/62/baseimg/logo_16541442053.png" 
+                 alt="LIME Logo" class="w-24 h-24 mx-auto mb-4 object-contain">
+            <h1 class="text-3xl font-bold text-blue-700 mb-2">👨‍🏫 Teacher Dashboard</h1>
+            <p class="text-gray-600">FCE Writing - Hệ thống chấm bài</p>
+            <div class="mt-4 h-1 w-32 bg-blue-500 mx-auto rounded"></div>
+        </div>
+        
+        <div class="mb-6">
+            <label class="block text-gray-700 font-semibold mb-2">🔐 Mật khẩu giáo viên:</label>
+            <input type="password" id="passwordInput" 
+                class="w-full px-4 py-3 border-2 border-blue-300 rounded-lg text-lg"
+                placeholder="Nhập mật khẩu..."
+                onkeypress="if(event.key==='Enter') verifyPassword()">
+        </div>
 
-  <script>
-    const API_URL = 'https://script.google.com/macros/s/AKfycbzIp9jfs0GEOh_Y-0AnBBXXaX4AjsMHHW7SkZjDjJwtXFHicIqXyddq9IOZmEijXuu-Fg/exec'; // ← DÁN URL WEB APP VÀO ĐÂY
+        <button onclick="verifyPassword()" 
+            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-lg transition duration-300 text-lg shadow-lg">
+            XÁC NHẬN
+        </button>
+        
+        <div class="mt-4 text-center text-sm text-gray-500">
+            📞 Liên hệ: 0976222792
+        </div>
+    </div>
+</div>
 
-    async function loadSubmissions() {
-      const week = document.getElementById('weekSelect').value;
-      const res = await fetch(`${API_URL}?action=getSubmissions&week=${week}`);
-      const data = await res.json();
-      if (data.status !== 'success') return alert('Lỗi tải dữ liệu');
+<!-- Màn hình Dashboard -->
+<div id="dashboardScreen" class="hidden min-h-screen p-4">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="bg-white rounded-2xl shadow-2xl p-6 mb-6 fade-in">
+            <div class="flex justify-between items-center flex-wrap gap-4">
+                <div class="flex items-center gap-3">
+                    <img src="https://gofirst.pro/images/uploads/62/baseimg/logo_16541442053.png" 
+                         alt="LIME Logo" class="w-16 h-16 object-contain">
+                    <div>
+                        <h1 class="text-3xl font-bold text-blue-700">👨‍🏫 Teacher Dashboard</h1>
+                        <p class="text-gray-600">FCE Writing - Quản lý & chấm bài</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-4">
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1">Chọn tuần:</label>
+                        <select id="weekSelect" onchange="loadWeekData()" 
+                            class="px-4 py-2 border-2 border-blue-300 rounded-lg font-semibold text-blue-700">
+                            <option value="1">Week 1</option>
+                            <option value="2">Week 2</option>
+                            <option value="3">Week 3</option>
+                        </select>
+                    </div>
+                    <button onclick="location.reload()" 
+                        class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-semibold">
+                        🔄 Làm mới
+                    </button>
+                </div>
+            </div>
+        </div>
 
-      const tbody = document.querySelector('#submissionsTable tbody');
-      tbody.innerHTML = '';
-      data.submissions.forEach(s => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${s.timestamp}</td>
-          <td>${s.code}</td>
-          <td>${s.name}</td>
-          <td>${s.totalTime}</td>
-          <td><button class="btn" onclick="openReview('${s.code}', ${week})">Xem & Sửa</button></td>
+        <!-- Thống kê tổng quan -->
+        <div id="statsSection" class="bg-white rounded-2xl shadow-2xl p-6 mb-6 fade-in">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">📊 Tổng quan</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-green-50 border-2 border-green-200 rounded-xl p-4 text-center">
+                    <p class="text-green-600 text-sm mb-1">Đã nộp bài</p>
+                    <p id="statSubmitted" class="text-3xl font-bold text-green-700">0</p>
+                </div>
+                <div class="bg-red-50 border-2 border-red-200 rounded-xl p-4 text-center">
+                    <p class="text-red-600 text-sm mb-1">Chưa nộp</p>
+                    <p id="statPending" class="text-3xl font-bold text-red-700">0</p>
+                </div>
+                <div class="bg-blue-50 border-2 border-blue-200 rounded-xl p-4 text-center">
+                    <p class="text-blue-600 text-sm mb-1">Điểm TB</p>
+                    <p id="statAverage" class="text-3xl font-bold text-blue-700">0</p>
+                </div>
+                <div class="bg-purple-50 border-2 border-purple-200 rounded-xl p-4 text-center">
+                    <p class="text-purple-600 text-sm mb-1">Level TB</p>
+                    <p id="statLevel" class="text-xl font-bold text-purple-700">N/A</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Danh sách học sinh -->
+        <div class="bg-white rounded-2xl shadow-2xl p-6 mb-6 fade-in">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">👨‍🎓 Danh sách học sinh đã nộp</h2>
+            
+            <div id="studentList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Sẽ được load bằng JS -->
+            </div>
+            
+            <div id="noStudents" class="hidden text-center py-12 text-gray-500">
+                <svg class="w-24 h-24 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                <p class="text-xl">Chưa có học sinh nào nộp bài</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Màn hình xem chi tiết & sửa feedback -->
+<div id="reviewScreen" class="hidden min-h-screen p-4 pb-32">
+    <div class="max-w-6xl mx-auto">
+        <!-- Header -->
+        <div class="bg-white rounded-2xl shadow-2xl p-6 mb-6 sticky top-4 z-10">
+            <div class="flex justify-between items-center flex-wrap gap-4">
+                <div>
+                    <button onclick="backToDashboard()" class="text-blue-600 hover:text-blue-800 font-semibold mb-2">
+                        ← Quay lại danh sách
+                    </button>
+                    <h1 class="text-2xl font-bold text-gray-800">
+                        📝 <span id="reviewStudentName">Học sinh</span> (<span id="reviewStudentCode">HS001</span>)
+                    </h1>
+                    <p class="text-sm text-gray-600">
+                        📅 Nộp lúc: <span id="reviewTimestamp">--</span> | 
+                        ⏱️ Thời gian: <span id="reviewTime">--</span>
+                    </p>
+                </div>
+                
+                <div class="flex gap-2">
+                    <button onclick="exportPDF()" id="exportBtn"
+                        class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold shadow-lg">
+                        ⬇️ Tải PDF
+                    </button>
+                    <button onclick="saveEdits()" id="saveBtn"
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold shadow-lg">
+                        💾 Lưu chỉnh sửa
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="bg-white rounded-t-2xl shadow-lg p-4 mb-0">
+            <div class="flex gap-2">
+                <div class="tab-button active" onclick="switchTab('topic1')" id="tab1">
+                    📝 Đề 1
+                </div>
+                <div class="tab-button" onclick="switchTab('topic2')" id="tab2">
+                    📝 Đề 2
+                </div>
+                <div class="tab-button" onclick="switchTab('behavior')" id="tab3">
+                    📊 Hành vi
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Tabs -->
+        <div id="tabContent" class="bg-white rounded-b-2xl rounded-tr-2xl shadow-2xl p-8">
+            <!-- Topic 1 -->
+            <div id="topic1Content" class="fade-in">
+                <div class="bg-blue-50 border-l-4 border-blue-600 p-4 mb-6 rounded-r-lg">
+                    <h3 class="font-bold text-blue-800 text-lg">📋 Đề bài đầy đủ:</h3>
+                    <p class="text-blue-900 mt-2" id="topic1Prompt">Loading...</p>
+                </div>
+
+                <!-- Phần 1: Phân tích đề -->
+                <div class="mb-8">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4 border-b-2 border-blue-500 pb-2">
+                        PHẦN 1: PHÂN TÍCH ĐỀ BÀI
+                    </h3>
+                    
+                    <div class="bg-gray-50 rounded-xl p-6 mb-4">
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <p class="font-semibold text-gray-700 mb-2">1. SS (Specific Subject):</p>
+                                <p class="text-gray-900 bg-white p-3 rounded border" id="t1_ss">--</p>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-gray-700 mb-2">2. IS (Independent Subject):</p>
+                                <p class="text-gray-900 bg-white p-3 rounded border" id="t1_is">--</p>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-gray-700 mb-2">3. Q (Question):</p>
+                                <p class="text-gray-900 bg-white p-3 rounded border" id="t1_q">--</p>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-gray-700 mb-2">4. T (Tasks):</p>
+                                <p class="text-gray-900 bg-white p-3 rounded border" id="t1_t">--</p>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <p class="font-semibold text-gray-700 mb-2">Outline:</p>
+                            <div class="grid grid-cols-3 gap-4">
+                                <div class="bg-white p-3 rounded border">
+                                    <p class="text-sm text-gray-600">Body 1:</p>
+                                    <p class="font-semibold" id="t1_body1">--</p>
+                                </div>
+                                <div class="bg-white p-3 rounded border">
+                                    <p class="text-sm text-gray-600">Body 2:</p>
+                                    <p class="font-semibold" id="t1_body2">--</p>
+                                </div>
+                                <div class="bg-white p-3 rounded border">
+                                    <p class="text-sm text-gray-600">Body 3:</p>
+                                    <p class="font-semibold" id="t1_body3">--</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Feedback AI phân tích - CÓ THỂ SỬA -->
+                    <div class="bg-blue-50 rounded-xl p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h4 class="text-lg font-bold text-blue-800">🤖 Nhận xét AI:</h4>
+                            <div class="flex items-center gap-4">
+                                <label class="text-sm font-semibold text-gray-700">Điểm phân tích:</label>
+                                <input type="number" id="t1_analysis_score" min="0" max="10" step="0.5"
+                                    class="w-20 px-3 py-2 border-2 border-blue-300 rounded-lg font-bold text-blue-700 text-center"
+                                    value="0">
+                                <span class="text-gray-600">/ 10</span>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-3">
+                            <div contenteditable="true" class="editable-feedback" id="t1_analysis_feedback">
+                                Click để chỉnh sửa nhận xét...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Phần 2: Mở bài -->
+                <div class="mb-8">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4 border-b-2 border-blue-500 pb-2">
+                        PHẦN 2: ĐOẠN MỞ BÀI
+                    </h3>
+                    
+                    <div class="bg-gray-50 rounded-xl p-6 mb-4">
+                        <p class="font-semibold text-gray-700 mb-2">Bài viết của học sinh:</p>
+                        <div class="bg-white p-4 rounded border-2 border-gray-300 italic" id="t1_intro">
+                            --
+                        </div>
+                        <p class="text-sm text-gray-600 mt-2">
+                            📝 Số từ: <span id="t1_wordcount" class="font-semibold">0</span> | 
+                            ⏱️ Thời gian: <span id="t1_time" class="font-semibold">--</span>
+                        </p>
+                    </div>
+
+                    <!-- Feedback AI mở bài - CÓ THỂ SỬA -->
+                    <div class="bg-purple-50 rounded-xl p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h4 class="text-lg font-bold text-purple-800">🤖 Nhận xét AI:</h4>
+                            <div class="flex items-center gap-4">
+                                <label class="text-sm font-semibold text-gray-700">Điểm mở bài:</label>
+                                <input type="number" id="t1_intro_score" min="0" max="10" step="0.5"
+                                    class="w-20 px-3 py-2 border-2 border-purple-300 rounded-lg font-bold text-purple-700 text-center"
+                                    value="0">
+                                <span class="text-gray-600">/ 10</span>
+                                
+                                <label class="text-sm font-semibold text-gray-700 ml-4">Level:</label>
+                                <select id="t1_cefr" class="px-3 py-2 border-2 border-purple-300 rounded-lg font-bold">
+                                    <option value="A2">A2</option>
+                                    <option value="A2+">A2+</option>
+                                    <option value="B1">B1</option>
+                                    <option value="B1+">B1+</option>
+                                    <option value="B2">B2</option>
+                                    <option value="B2+">B2+</option>
+                                    <option value="C1">C1</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div contenteditable="true" class="editable-feedback" id="t1_intro_feedback">
+                            Click để chỉnh sửa nhận xét...
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Topic 2 (tương tự Topic 1) -->
+            <div id="topic2Content" class="hidden">
+                <div class="bg-purple-50 border-l-4 border-purple-600 p-4 mb-6 rounded-r-lg">
+                    <h3 class="font-bold text-purple-800 text-lg">📋 Đề bài đầy đủ:</h3>
+                    <p class="text-purple-900 mt-2" id="topic2Prompt">Loading...</p>
+                </div>
+
+                <!-- Phần 1: Phân tích đề -->
+                <div class="mb-8">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4 border-b-2 border-purple-500 pb-2">
+                        PHẦN 1: PHÂN TÍCH ĐỀ BÀI
+                    </h3>
+                    
+                    <div class="bg-gray-50 rounded-xl p-6 mb-4">
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <p class="font-semibold text-gray-700 mb-2">1. SS (Specific Subject):</p>
+                                <p class="text-gray-900 bg-white p-3 rounded border" id="t2_ss">--</p>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-gray-700 mb-2">2. IS (Independent Subject):</p>
+                                <p class="text-gray-900 bg-white p-3 rounded border" id="t2_is">--</p>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-gray-700 mb-2">3. Q (Question):</p>
+                                <p class="text-gray-900 bg-white p-3 rounded border" id="t2_q">--</p>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-gray-700 mb-2">4. T (Tasks):</p>
+                                <p class="text-gray-900 bg-white p-3 rounded border" id="t2_t">--</p>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <p class="font-semibold text-gray-700 mb-2">Outline:</p>
+                            <div class="grid grid-cols-3 gap-4">
+                                <div class="bg-white p-3 rounded border">
+                                    <p class="text-sm text-gray-600">Body 1:</p>
+                                    <p class="font-semibold" id="t2_body1">--</p>
+                                </div>
+                                <div class="bg-white p-3 rounded border">
+                                    <p class="text-sm text-gray-600">Body 2:</p>
+                                    <p class="font-semibold" id="t2_body2">--</p>
+                                </div>
+                                <div class="bg-white p-3 rounded border">
+                                    <p class="text-sm text-gray-600">Body 3:</p>
+                                    <p class="font-semibold" id="t2_body3">--</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-blue-50 rounded-xl p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h4 class="text-lg font-bold text-blue-800">🤖 Nhận xét AI:</h4>
+                            <div class="flex items-center gap-4">
+                                <label class="text-sm font-semibold text-gray-700">Điểm phân tích:</label>
+                                <input type="number" id="t2_analysis_score" min="0" max="10" step="0.5"
+                                    class="w-20 px-3 py-2 border-2 border-blue-300 rounded-lg font-bold text-blue-700 text-center"
+                                    value="0">
+                                <span class="text-gray-600">/ 10</span>
+                            </div>
+                        </div>
+                        
+                        <div contenteditable="true" class="editable-feedback" id="t2_analysis_feedback">
+                            Click để chỉnh sửa nhận xét...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Phần 2: Mở bài -->
+                <div class="mb-8">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4 border-b-2 border-purple-500 pb-2">
+                        PHẦN 2: ĐOẠN MỞ BÀI
+                    </h3>
+                    
+                    <div class="bg-gray-50 rounded-xl p-6 mb-4">
+                        <p class="font-semibold text-gray-700 mb-2">Bài viết của học sinh:</p>
+                        <div class="bg-white p-4 rounded border-2 border-gray-300 italic" id="t2_intro">
+                            --
+                        </div>
+                        <p class="text-sm text-gray-600 mt-2">
+                            📝 Số từ: <span id="t2_wordcount" class="font-semibold">0</span> | 
+                            ⏱️ Thời gian: <span id="t2_time" class="font-semibold">--</span>
+                        </p>
+                    </div>
+
+                    <div class="bg-purple-50 rounded-xl p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h4 class="text-lg font-bold text-purple-800">🤖 Nhận xét AI:</h4>
+                            <div class="flex items-center gap-4">
+                                <label class="text-sm font-semibold text-gray-700">Điểm mở bài:</label>
+                                <input type="number" id="t2_intro_score" min="0" max="10" step="0.5"
+                                    class="w-20 px-3 py-2 border-2 border-purple-300 rounded-lg font-bold text-purple-700 text-center"
+                                    value="0">
+                                <span class="text-gray-600">/ 10</span>
+                                
+                                <label class="text-sm font-semibold text-gray-700 ml-4">Level:</label>
+                                <select id="t2_cefr" class="px-3 py-2 border-2 border-purple-300 rounded-lg font-bold">
+                                    <option value="A2">A2</option>
+                                    <option value="A2+">A2+</option>
+                                    <option value="B1">B1</option>
+                                    <option value="B1+">B1+</option>
+                                    <option value="B2">B2</option>
+                                    <option value="B2+">B2+</option>
+                                    <option value="C1">C1</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div contenteditable="true" class="editable-feedback" id="t2_intro_feedback">
+                            Click để chỉnh sửa nhận xét...
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Behavior Tab -->
+            <div id="behaviorContent" class="hidden">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">📊 Phân tích hành vi làm bài</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-blue-50 rounded-xl p-6">
+                        <h4 class="font-bold text-blue-800 mb-4">⏱️ Thời gian phân bổ</h4>
+                        <div class="space-y-2" id="timeBreakdown">
+                            <!-- Sẽ được load bằng JS -->
+                        </div>
+                    </div>
+                    
+                    <div class="bg-yellow-50 rounded-xl p-6">
+                        <h4 class="font-bold text-yellow-800 mb-4">✏️ Chỉnh sửa & Paste</h4>
+                        <div class="space-y-2" id="editStats">
+                            <!-- Sẽ được load bằng JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ========== CONFIGURATION ==========
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzIp9jfs0GEOh_Y-0AnBBXXaX4AjsMHHW7SkZjDjJwtXFHicIqXyddq9IOZmEijXuu-Fg/exec';
+const TEACHER_PASSWORD = 'lime2025';
+
+// ========== GLOBAL VARIABLES ==========
+let currentWeek = 1;
+let currentStudent = null;
+let allStudents = [];
+let originalFeedback = {}; // Lưu feedback gốc để so sánh
+
+// ========== PASSWORD VERIFICATION ==========
+function verifyPassword() {
+    const password = document.getElementById('passwordInput').value;
+    
+    if (password === TEACHER_PASSWORD) {
+        document.getElementById('passwordScreen').classList.add('hidden');
+        document.getElementById('dashboardScreen').classList.remove('hidden');
+        loadWeekData();
+    } else {
+        alert('❌ Mật khẩu không đúng!');
+        document.getElementById('passwordInput').value = '';
+    }
+}
+
+// ========== LOAD WEEK DATA ==========
+async function loadWeekData() {
+    currentWeek = document.getElementById('weekSelect').value;
+    
+    showLoading('studentList', 'Đang tải dữ liệu...');
+    
+    try {
+        const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=getSubmittedStudents&week=${currentWeek}`);
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            allStudents = data.students || [];
+            displayStudentList(allStudents);
+            updateStats(allStudents);
+        } else {
+            throw new Error('Không thể tải dữ liệu');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('studentList').innerHTML = `
+            <div class="col-span-full text-center text-red-600 p-8">
+                ❌ Lỗi kết nối! Vui lòng kiểm tra Internet hoặc thử lại.
+            </div>
         `;
-        tbody.appendChild(tr);
-      });
     }
+}
 
-    function openReview(code, week) {
-      window.open(`teacher-review.html?code=${code}&week=${week}`, '_blank');
+// ========== DISPLAY STUDENT LIST ==========
+function displayStudentList(students) {
+    const container = document.getElementById('studentList');
+    const noStudents = document.getElementById('noStudents');
+    
+    if (!students || students.length === 0) {
+        container.classList.add('hidden');
+        noStudents.classList.remove('hidden');
+        return;
     }
+    
+    container.classList.remove('hidden');
+    noStudents.classList.add('hidden');
+    
+    container.innerHTML = students.map(student => {
+        const statusBadge = student.aiStatus === 'DONE' 
+            ? '<span class="text-xs bg-green-500 text-white px-2 py-1 rounded">✅ Đã chấm</span>'
+            : '<span class="text-xs bg-yellow-500 text-white px-2 py-1 rounded">⏳ Đang chấm</span>';
+        
+        return `
+            <div class="student-card bg-white border-2 border-gray-200 rounded-xl p-4 shadow-md"
+                 onclick="viewStudentDetail('${student.code}')">
+                <div class="flex justify-between items-start mb-3">
+                    <div>
+                        <h3 class="font-bold text-gray-800 text-lg">${student.name}</h3>
+                        <p class="text-sm text-gray-600">${student.code}</p>
+                    </div>
+                    ${statusBadge}
+                </div>
+                
+                <div class="text-sm text-gray-600 space-y-1">
+                    <p>📅 ${student.timestamp}</p>
+                    <p>⏱️ ${student.totalTime}</p>
+                </div>
+                
+                <button class="mt-3 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition">
+                    👁️ Xem chi tiết
+                </button>
+            </div>
+        `;
+    }).join('');
+}
 
-    // Tự động tải khi mở trang
-    window.onload = loadSubmissions;
-  </script>
+// ========== UPDATE STATISTICS ==========
+function updateStats(students) {
+    const submitted = students.length;
+    const pending = 20 - submitted; // Giả sử có 20 học sinh tổng
+    
+    document.getElementById('statSubmitted').textContent = submitted;
+    document.getElementById('statPending').textContent = pending > 0 ? pending : 0;
+    
+    // Tính điểm TB và level (sẽ cập nhật sau khi có feedback)
+    document.getElementById('statAverage').textContent = '--';
+    document.getElementById('statLevel').textContent = '--';
+}
+
+// ========== VIEW STUDENT DETAIL ==========
+async function viewStudentDetail(studentCode) {
+    currentStudent = studentCode;
+    
+    document.getElementById('dashboardScreen').classList.add('hidden');
+    document.getElementById('reviewScreen').classList.remove('hidden');
+    
+    showLoading('tabContent', 'Đang tải chi tiết...');
+    
+    try {
+        const response = await fetch(
+            `${GOOGLE_SCRIPT_URL}?action=getStudentDetails&code=${studentCode}&week=${currentWeek}`
+        );
+        const data = await response.json();
+        
+        if (data.status === 'success' && data.data) {
+            displayStudentDetail(data.data);
+        } else {
+            throw new Error(data.data?.error || 'Không thể tải dữ liệu');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Lỗi khi tải dữ liệu học sinh!');
+        backToDashboard();
+    }
+}
+
+// ========== DISPLAY STUDENT DETAIL ==========
+function displayStudentDetail(data) {
+    // Header info
+    document.getElementById('reviewStudentName').textContent = data.studentInfo.name;
+    document.getElementById('reviewStudentCode').textContent = data.studentInfo.code;
+    document.getElementById('reviewTimestamp').textContent = data.studentInfo.timestamp;
+    document.getElementById('reviewTime').textContent = data.studentInfo.totalTime;
+    
+    // Topic 1 - Student work
+    document.getElementById('t1_ss').textContent = data.topic1.ss || '(Không có)';
+    document.getElementById('t1_is').textContent = data.topic1.is || '(Không có)';
+    document.getElementById('t1_q').textContent = data.topic1.q || '(Không có)';
+    document.getElementById('t1_t').textContent = data.topic1.t || '(Không có)';
+    document.getElementById('t1_body1').textContent = data.topic1.body1 || '(Không có)';
+    document.getElementById('t1_body2').textContent = data.topic1.body2 || '(Không có)';
+    document.getElementById('t1_body3').textContent = data.topic1.body3 || '(Không có)';
+    document.getElementById('t1_intro').textContent = data.topic1.introduction || '(Không có)';
+    document.getElementById('t1_wordcount').textContent = data.topic1.wordCount || 0;
+    document.getElementById('t1_time').textContent = data.topic1.timeUsed || '--';
+    
+    // Topic 2 - Student work
+    document.getElementById('t2_ss').textContent = data.topic2.ss || '(Không có)';
+    document.getElementById('t2_is').textContent = data.topic2.is || '(Không có)';
+    document.getElementById('t2_q').textContent = data.topic2.q || '(Không có)';
+    document.getElementById('t2_t').textContent = data.topic2.t || '(Không có)';
+    document.getElementById('t2_body1').textContent = data.topic2.body1 || '(Không có)';
+    document.getElementById('t2_body2').textContent = data.topic2.body2 || '(Không có)';
+    document.getElementById('t2_body3').textContent = data.topic2.body3 || '(Không có)';
+    document.getElementById('t2_intro').textContent = data.topic2.introduction || '(Không có)';
+    document.getElementById('t2_wordcount').textContent = data.topic2.wordCount || 0;
+    document.getElementById('t2_time').textContent = data.topic2.timeUsed || '--';
+    
+    // Load feedback (AI hoặc Teacher edited)
+    if (data.feedback) {
+        loadFeedback(data.feedback, data.hasTeacherEdit);
+    } else {
+        // Chưa có feedback AI
+        setPlaceholderFeedback();
+    }
+    
+    // Show first tab
+    switchTab('topic1');
+}
+
+// ========== LOAD FEEDBACK ==========
+function loadFeedback(feedback, isTeacherEdit) {
+    // Topic 1
+    if (feedback.topic1) {
+        const t1 = feedback.topic1;
+        
+        document.getElementById('t1_analysis_score').value = t1.analysis_score || 0;
+        document.getElementById('t1_intro_score').value = t1.introduction_score || 0;
+        document.getElementById('t1_cefr').value = t1.cefr_level || 'B1';
+        
+        // Load feedback text (parse JSON nếu cần)
+        const analysisFeedback = formatAnalysisFeedback(t1.analysis_feedback);
+        const introFeedback = formatIntroFeedback(t1.introduction_feedback);
+        
+        document.getElementById('t1_analysis_feedback').innerHTML = analysisFeedback;
+        document.getElementById('t1_intro_feedback').innerHTML = introFeedback;
+        
+        // Save original
+        originalFeedback.topic1 = {
+            analysis_score: t1.analysis_score,
+            intro_score: t1.introduction_score,
+            cefr: t1.cefr_level,
+            analysis_text: analysisFeedback,
+            intro_text: introFeedback
+        };
+    }
+    
+    // Topic 2
+    if (feedback.topic2) {
+        const t2 = feedback.topic2;
+        
+        document.getElementById('t2_analysis_score').value = t2.analysis_score || 0;
+        document.getElementById('t2_intro_score').value = t2.introduction_score || 0;
+        document.getElementById('t2_cefr').value = t2.cefr_level || 'B1';
+        
+        const analysisFeedback = formatAnalysisFeedback(t2.analysis_feedback);
+        const introFeedback = formatIntroFeedback(t2.introduction_feedback);
+        
+        document.getElementById('t2_analysis_feedback').innerHTML = analysisFeedback;
+        document.getElementById('t2_intro_feedback').innerHTML = introFeedback;
+        
+        originalFeedback.topic2 = {
+            analysis_score: t2.analysis_score,
+            intro_score: t2.introduction_score,
+            cefr: t2.cefr_level,
+            analysis_text: analysisFeedback,
+            intro_text: introFeedback
+        };
+    }
+    
+    // Show badge if teacher edited
+    if (isTeacherEdit) {
+        showTeacherEditBadge();
+    }
+}
+
+// ========== FORMAT FEEDBACK ==========
+function formatAnalysisFeedback(feedbackData) {
+    if (!feedbackData) return 'Chưa có nhận xét từ AI';
+    
+    let feedback = feedbackData;
+    if (typeof feedbackData === 'string') {
+        try {
+            feedback = JSON.parse(feedbackData);
+        } catch (e) {
+            return feedbackData;
+        }
+    }
+    
+    let html = '<div class="space-y-2">';
+    
+    if (feedback.ss_comment) {
+        html += `<p><strong>✅ SS:</strong> ${feedback.ss_comment}</p>`;
+    }
+    if (feedback.is_comment) {
+        html += `<p><strong>✅ IS:</strong> ${feedback.is_comment}</p>`;
+    }
+    if (feedback.q_comment) {
+        html += `<p><strong>✅ Q:</strong> ${feedback.q_comment}</p>`;
+    }
+    if (feedback.t_comment) {
+        html += `<p><strong>✅ T:</strong> ${feedback.t_comment}</p>`;
+    }
+    if (feedback.outline_comment) {
+        html += `<p><strong>📝 Outline:</strong> ${feedback.outline_comment}</p>`;
+    }
+    
+    html += '</div>';
+    return html;
+}
+
+function formatIntroFeedback(feedbackData) {
+    if (!feedbackData) return 'Chưa có nhận xét từ AI';
+    
+    let feedback = feedbackData;
+    if (typeof feedbackData === 'string') {
+        try {
+            feedback = JSON.parse(feedbackData);
+        } catch (e) {
+            return feedbackData;
+        }
+    }
+    
+    let html = '<div class="space-y-3">';
+    
+    // Strengths
+    if (feedback.strengths && feedback.strengths.length > 0) {
+        html += '<div><p class="font-bold text-green-700 mb-2">✅ ĐIỂM MẠNH:</p><ul class="list-disc pl-5 space-y-1">';
+        feedback.strengths.forEach(s => {
+            html += `<li>${s}</li>`;
+        });
+        html += '</ul></div>';
+    }
+    
+    // Weaknesses
+    if (feedback.weaknesses && feedback.weaknesses.length > 0) {
+        html += '<div><p class="font-bold text-orange-700 mb-2">⚠️ CẦN CẢI THIỆN:</p><ul class="list-disc pl-5 space-y-1">';
+        feedback.weaknesses.forEach(w => {
+            html += `<li>${w}</li>`;
+        });
+        html += '</ul></div>';
+    }
+    
+    // Grammar errors
+    if (feedback.grammar_errors && feedback.grammar_errors.length > 0) {
+        html += '<div><p class="font-bold text-red-700 mb-2">🔴 LỖI GRAMMAR:</p><ul class="list-disc pl-5 space-y-1">';
+        feedback.grammar_errors.forEach(err => {
+            html += `<li>"${err.error}" → "${err.correction}"</li>`;
+        });
+        html += '</ul></div>';
+    }
+    
+    // Overall comment
+    if (feedback.overall_comment) {
+        html += `<div><p class="font-bold text-blue-700 mb-2">💬 NHẬN XÉT CHUNG:</p><p>${feedback.overall_comment}</p></div>`;
+    }
+    
+    // Improvement suggestions
+    if (feedback.improvement_suggestions && feedback.improvement_suggestions.length > 0) {
+        html += '<div><p class="font-bold text-purple-700 mb-2">💡 GỢI Ý CẢI THIỆN:</p><ol class="list-decimal pl-5 space-y-1">';
+        feedback.improvement_suggestions.forEach(sug => {
+            html += `<li>${sug}</li>`;
+        });
+        html += '</ol></div>';
+    }
+    
+    html += '</div>';
+    return html;
+}
+
+function setPlaceholderFeedback() {
+    const placeholder = '<p class="text-gray-500 italic">⏳ AI đang chấm bài, vui lòng chờ trong giây lát...</p>';
+    
+    document.getElementById('t1_analysis_feedback').innerHTML = placeholder;
+    document.getElementById('t1_intro_feedback').innerHTML = placeholder;
+    document.getElementById('t2_analysis_feedback').innerHTML = placeholder;
+    document.getElementById('t2_intro_feedback').innerHTML = placeholder;
+}
+
+// ========== SWITCH TAB ==========
+function switchTab(tabName) {
+    // Hide all tabs
+    document.getElementById('topic1Content').classList.add('hidden');
+    document.getElementById('topic2Content').classList.add('hidden');
+    document.getElementById('behaviorContent').classList.add('hidden');
+    
+    // Remove active from all buttons
+    document.getElementById('tab1').classList.remove('active');
+    document.getElementById('tab2').classList.remove('active');
+    document.getElementById('tab3').classList.remove('active');
+    
+    // Show selected tab
+    if (tabName === 'topic1') {
+        document.getElementById('topic1Content').classList.remove('hidden');
+        document.getElementById('tab1').classList.add('active');
+    } else if (tabName === 'topic2') {
+        document.getElementById('topic2Content').classList.remove('hidden');
+        document.getElementById('tab2').classList.add('active');
+    } else if (tabName === 'behavior') {
+        document.getElementById('behaviorContent').classList.remove('hidden');
+        document.getElementById('tab3').classList.add('active');
+    }
+}
+
+// ========== SAVE EDITS ==========
+async function saveEdits() {
+    if (!currentStudent) return;
+    
+    const saveBtn = document.getElementById('saveBtn');
+    const originalText = saveBtn.innerHTML;
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = '<div class="spinner"></div> Đang lưu...';
+    
+    // Collect edited data
+    const editedData = {
+        studentCode: currentStudent,
+        studentName: document.getElementById('reviewStudentName').textContent,
+        weekNumber: currentWeek,
+        topic1: {
+            analysis_score: parseFloat(document.getElementById('t1_analysis_score').value),
+            introduction_score: parseFloat(document.getElementById('t1_intro_score').value),
+            cefr_level: document.getElementById('t1_cefr').value,
+            analysis_feedback: document.getElementById('t1_analysis_feedback').innerHTML,
+            introduction_feedback: document.getElementById('t1_intro_feedback').innerHTML
+        },
+        topic2: {
+            analysis_score: parseFloat(document.getElementById('t2_analysis_score').value),
+            introduction_score: parseFloat(document.getElementById('t2_intro_score').value),
+            cefr_level: document.getElementById('t2_cefr').value,
+            analysis_feedback: document.getElementById('t2_analysis_feedback').innerHTML,
+            introduction_feedback: document.getElementById('t2_intro_feedback').innerHTML
+        }
+    };
+    
+    try {
+        const response = await fetch(GOOGLE_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                action: 'saveEditedFeedback',
+                ...editedData
+            })
+        });
+        
+        // Update original feedback
+        originalFeedback = {
+            topic1: { ...editedData.topic1 },
+            topic2: { ...editedData.topic2 }
+        };
+        
+        showTeacherEditBadge();
+        
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = originalText;
+        
+        alert('✅ Đã lưu chỉnh sửa thành công!');
+        
+    } catch (error) {
+        console.error('Error:', error);
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = originalText;
+        alert('⚠️ Đã lưu (no-cors mode) - Vui lòng kiểm tra Google Sheets');
+    }
+}
+
+// ========== EXPORT PDF ==========
+async function exportPDF() {
+    if (!currentStudent) return;
+    
+    const exportBtn = document.getElementById('exportBtn');
+    const originalText = exportBtn.innerHTML;
+    exportBtn.disabled = true;
+    exportBtn.innerHTML = '<div class="spinner"></div> Đang tạo PDF...';
+    
+    try {
+        const response = await fetch(
+            `${GOOGLE_SCRIPT_URL}?action=exportPDF&code=${currentStudent}&week=${currentWeek}`
+        );
+        const data = await response.json();
+        
+        if (data.success) {
+            window.open(data.pdfUrl, '_blank');
+            alert('✅ PDF đã được tạo! Đang mở...');
+        } else {
+            throw new Error(data.error || 'Không thể tạo PDF');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Lỗi khi tạo PDF: ' + error.message);
+    } finally {
+        exportBtn.disabled = false;
+        exportBtn.innerHTML = originalText;
+    }
+}
+
+// ========== BACK TO DASHBOARD ==========
+function backToDashboard() {
+    document.getElementById('reviewScreen').classList.add('hidden');
+    document.getElementById('dashboardScreen').classList.remove('hidden');
+    currentStudent = null;
+}
+
+// ========== HELPER FUNCTIONS ==========
+function showLoading(elementId, message) {
+    document.getElementById(elementId).innerHTML = `
+        <div class="text-center py-12">
+            <div class="spinner mx-auto mb-4"></div>
+            <p class="text-gray-600">${message}</p>
+        </div>
+    `;
+}
+
+function showTeacherEditBadge() {
+    // Add badge to show teacher has edited
+    const header = document.querySelector('#reviewScreen .bg-white.rounded-2xl.shadow-2xl');
+    if (header && !header.querySelector('.teacher-edit-badge')) {
+        const badge = document.createElement('div');
+        badge.className = 'teacher-edit-badge bg-orange-500 text-white px-4 py-2 rounded-lg font-semibold text-sm inline-block mt-2';
+        badge.innerHTML = '✏️ Đã chỉnh sửa bởi giáo viên';
+        header.querySelector('div').appendChild(badge);
+    }
+}
+
+// ========== INIT ==========
+document.addEventListener('DOMContentLoaded', () => {
+    // Focus password input
+    document.getElementById('passwordInput').focus();
+});
+</script>
+
 </body>
 </html>
