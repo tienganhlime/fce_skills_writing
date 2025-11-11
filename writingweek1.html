@@ -752,12 +752,14 @@ async function submitTest() {
     
     console.log('📤 Dữ liệu gửi đi:', dataToSend);
     
-    try {
-        const response = await fetch(GOOGLE_SCRIPT_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(dataToSend)
-        });
+   try {
+    const response = await fetch(GOOGLE_SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(dataToSend),
+      mode: 'cors',  // ✅ Thêm mode: 'cors' để enable CORS
+      credentials: 'omit'  // Không gửi cookie nếu không cần
+    });
         
         const result = await response.json();
         console.log('📥 Kết quả từ server:', result);
