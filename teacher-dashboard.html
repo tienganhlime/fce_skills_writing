@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FCE Writing - Giáo viên</title>
+  <style>
+    body { font-family: Arial; margin: 20px; background: #f5f5f5; }
+    h1 { color: #2196F3; text-align: center; }
+    .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    select, button { padding: 10px; margin: 10px 0; font-size: 16px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+    th { background: #2196F3; color: white; }
+    tr:nth-child(even) { background: #f9f9f9; }
+    .btn { background: #4CAF50; color: white; border: none; padding: 8px 16px; cursor: pointer; border-radius: 5px; }
+    .btn:hover { background: #45a049; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>FCE Writing - Dashboard Giáo viên</h1>
+    <label>Chọn tuần:</label>
+    <select id="weekSelect">
+      <option value="1">Week 1</option>
+      <option value="2">Week 2</option>
+      <option value="3">Week 3</option>
+    </select>
+    <button onclick="loadSubmissions()">Tải danh sách</button>
+
+    <table id="submissionsTable">
+      <thead>
+        <tr>
+          <th>Thời gian</th>
+          <th>Mã HS</th>
+          <th>Tên</th>
+          <th>Thời gian làm</th>
+          <th>Hành động</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <script>
+    const API_URL = 'https://script.google.com/macros/s/AKfycbzIp9jfs0GEOh_Y-0AnBBXXaX4AjsMHHW7SkZjDjJwtXFHicIqXyddq9IOZmEijXuu-Fg/exec'; // ← DÁN URL WEB APP VÀO ĐÂY
+
+    async function loadSubmissions() {
+      const week = document.getElementById('weekSelect').value;
+      const res = await fetch(`${API_URL}?action=getSubmissions&week=${week}`);
+      const data = await res.json();
+      if (data.status !== 'success') return alert('Lỗi tải dữ liệu');
+
+      const tbody = document.querySelector('#submissionsTable tbody');
+      tbody.innerHTML = '';
+      data.submissions.forEach(s => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${s.timestamp}</td>
+          <td>${s.code}</td>
+          <td>${s.name}</td>
+          <td>${s.totalTime}</td>
+          <td><button class="btn" onclick="openReview('${s.code}', ${week})">Xem & Sửa</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function openReview(code, week) {
+      window.open(`teacher-review.html?code=${code}&week=${week}`, '_blank');
+    }
+
+    // Tự động tải khi mở trang
+    window.onload = loadSubmissions;
+  </script>
+</body>
+</html>
