@@ -443,44 +443,37 @@ let fieldTimers = {};
 
 // ========== STUDENT VERIFICATION ==========
 async function verifyStudent() {
-    const code = document.getElementById('studentCode').value.trim().toUpperCase();
-    if (!code) {
-        alert('Vui lòng nhập mã học sinh!');
-        return;
-    }
-    
-    const btn = event.target;
-    const originalText = btn.innerHTML;
-    btn.disabled = true;
-    btn.innerHTML = '<div class="spinner"></div> <span>Đang xác nhận...</span>';
-    
-    try {
-        const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=verify&code=${code}`);
-        const data = await response.json();
-        
-        if (data.exists) {
-            studentInfo = { code: code, name: data.studentName };
-            document.getElementById('codeScreen').classList.add('hidden');
-            document.getElementById('testScreen').classList.remove('hidden');
-            document.getElementById('headerName').textContent = data.studentName;
-            document.getElementById('headerCode').textContent = code;
-            
-            initializeTracking();
-            startTime = new Date();
-            startTimer();
-        } else {
-            btn.disabled = false;
-            btn.innerHTML = originalText;
-            alert('❌ Mã học sinh không tồn tại!\n\n📞 Vui lòng liên hệ giáo viên để được hỗ trợ.');
-        }
-    } catch (error) {
-        btn.disabled = false;
-        btn.innerHTML = originalText;
-        alert('⚠️ Lỗi kết nối! Vui lòng kiểm tra Internet hoặc liên hệ giáo viên.');
-        console.error('Error:', error);
-    }
-}
+  const code = document.getElementById('studentCode').value.trim().toUpperCase();
+  if (!code) {
+    alert('Vui lòng nhập mã học sinh!');
+    return;
+  }
 
+  const url = `${GOOGLE_SCRIPT_URL}?action=verify&code=${encodeURIComponent(code)}`;
+
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      mode: 'cors',  // BẮT BUỘC
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    const result = await response.json();
+
+    if (result.status === 'success' && result.exists) {
+      studentInfo.code = code;
+      studentInfo.name = result.studentName;
+      startTest();
+    } else {
+      alert('Mã học sinh không tồn tại!');
+    }
+  } catch (error) {
+    console.error('Lỗi verify:', error);
+    alert('Lỗi kết nối. Vui lòng thử lại.');
+  }
+}
 // ========== TIMER ==========
 function startTimer() {
     timerInterval = setInterval(() => {
