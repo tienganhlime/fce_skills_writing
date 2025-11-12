@@ -664,14 +664,28 @@ async function viewStudentDetail(studentCode) {
     
     try {
         const response = await fetch(
-            `${GOOGLE_SCRIPT_URL}?action=getStudentDetails&code=${studentCode}&week=${currentWeek}`
+            `${GOOGLE_SCRIPT_URL}?action=getStudentDetail&code=${studentCode}&week=${currentWeek}`
         );
         const data = await response.json();
         
-        if (data.status === 'success' && data.data) {
-            displayStudentDetail(data.data);
+        if (data.status === 'success') {
+            // ← Đổi cấu trúc data vì Apps Script trả về khác
+            const formattedData = {
+                studentInfo: {
+                    code: data.work.studentCode,
+                    name: data.work.studentName,
+                    timestamp: data.work.timestamp,
+                    totalTime: data.work.totalTime
+                },
+                topic1: data.work.topic1,
+                topic2: data.work.topic2,
+                feedback: data.teacherFeedback || data.aiFeedback,
+                hasTeacherEdit: !!data.teacherFeedback
+            };
+            
+            displayStudentDetail(formattedData);
         } else {
-            throw new Error(data.data?.error || 'Không thể tải dữ liệu');
+            throw new Error(data.error || 'Không thể tải dữ liệu');
         }
     } catch (error) {
         console.error('Error:', error);
