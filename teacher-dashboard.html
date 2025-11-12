@@ -609,18 +609,18 @@ function displayStudentList(students) {
         
         return `
             <div class="student-card bg-white border-2 border-gray-200 rounded-xl p-4 shadow-md"
-                 onclick="viewStudentDetail('${student.code}')">
+                 data-student-code="${student.code || ''}">
                 <div class="flex justify-between items-start mb-3">
                     <div>
-                        <h3 class="font-bold text-gray-800 text-lg">${student.name}</h3>
-                        <p class="text-sm text-gray-600">${student.code}</p>
+                        <h3 class="font-bold text-gray-800 text-lg">${student.name || 'Không có tên'}</h3>
+                        <p class="text-sm text-gray-600">${student.code || ''}</p>
                     </div>
                     ${statusBadge}
                 </div>
                 
                 <div class="text-sm text-gray-600 space-y-1">
-                    <p>📅 ${student.timestamp}</p>
-                    <p>⏱️ ${student.totalTime}</p>
+                    <p>📅 ${student.timestamp || '--'}</p>
+                    <p>⏱️ ${student.totalTime || '--'}</p>
                 </div>
                 
                 <button class="mt-3 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition">
@@ -629,8 +629,17 @@ function displayStudentList(students) {
             </div>
         `;
     }).join('');
+    
+    // Gắn event listener sau khi render
+    container.querySelectorAll('.student-card').forEach(card => {
+        card.addEventListener('click', () => {
+            const studentCode = card.getAttribute('data-student-code');
+            if (studentCode) {
+                viewStudentDetail(studentCode);
+            }
+        });
+    });
 }
-
 // ========== UPDATE STATISTICS ==========
 function updateStats(students) {
     const submitted = students.length;
