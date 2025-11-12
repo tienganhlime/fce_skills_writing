@@ -689,7 +689,12 @@ function displayStudentDetail(data) {
     document.getElementById('t1_body3').textContent = data.topic1.body3 || '(Không có)';
     document.getElementById('t1_intro').textContent = data.topic1.introduction || '(Không có)';
     document.getElementById('t1_wordcount').textContent = data.topic1.wordCount || 0;
-    document.getElementById('t1_time').textContent = data.topic1.timeUsed || '--';
+    
+    // Safe update for time (check if element exists)
+    const t1TimeEl = document.getElementById('t1_time');
+    if (t1TimeEl) {
+        t1TimeEl.textContent = data.topic1.timeUsed || '--';
+    }
     
     // Topic 2 - Student work
     document.getElementById('t2_ss').textContent = data.topic2.ss || '(Không có)';
@@ -701,7 +706,12 @@ function displayStudentDetail(data) {
     document.getElementById('t2_body3').textContent = data.topic2.body3 || '(Không có)';
     document.getElementById('t2_intro').textContent = data.topic2.introduction || '(Không có)';
     document.getElementById('t2_wordcount').textContent = data.topic2.wordCount || 0;
-    document.getElementById('t2_time').textContent = data.topic2.timeUsed || '--';
+    
+    // Safe update for time
+    const t2TimeEl = document.getElementById('t2_time');
+    if (t2TimeEl) {
+        t2TimeEl.textContent = data.topic2.timeUsed || '--';
+    }
     
     // Load feedback (AI hoặc Teacher edited)
     if (data.feedback) {
