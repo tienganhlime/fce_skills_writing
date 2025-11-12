@@ -487,39 +487,38 @@ async function verifyStudent() {
         alert('Vui lòng nhập mã học sinh!');
         return;
     }
-    
+
     const btn = event.target;
     const originalText = btn.innerHTML;
     btn.disabled = true;
     btn.innerHTML = '<div class="spinner"></div> <span>Đang xác nhận...</span>';
-    
+
     try {
         const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=verify&code=${code}`);
         const data = await response.json();
-        
+
         if (data.exists) {
             studentInfo = { code: code, name: data.studentName };
             document.getElementById('codeScreen').classList.add('hidden');
             document.getElementById('testScreen').classList.remove('hidden');
             document.getElementById('headerName').textContent = data.studentName;
             document.getElementById('headerCode').textContent = code;
-            
+
             initializeTracking();
             startTime = new Date();
             startTimer();
         } else {
             btn.disabled = false;
             btn.innerHTML = originalText;
-            alert('❌ Mã học sinh không tồn tại!\n\n📞 Vui lòng liên hệ giáo viên để được hỗ trợ.');
+            alert('Mã học sinh không tồn tại!');
         }
     } catch (error) {
         btn.disabled = false;
         btn.innerHTML = originalText;
-        alert('⚠️ Lỗi kết nối! Vui lòng kiểm tra Internet hoặc liên hệ giáo viên.');
-        console.error('Error:', error);
+        alert('Lỗi kết nối! Vui lòng thử lại.');
+        console.error(error);
     }
 }
-
 // ========== TIMER ==========
 function startTimer() {
     timerInterval = setInterval(() => {
