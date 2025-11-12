@@ -986,6 +986,15 @@ function switchTab(tabName) {
         document.getElementById('tab3').classList.add('active');
         loadBehaviorData();
     }
+ // ✅ THÊM DÒNG NÀY
+    // Đảm bảo tab được chọn hiển thị
+    if (tabName === 'topic1') {
+        document.getElementById('topic1Content').classList.remove('hidden');
+    } else if (tabName === 'topic2') {
+        document.getElementById('topic2Content').classList.remove('hidden');
+    } else if (tabName === 'behavior') {
+        document.getElementById('behaviorContent').classList.remove('hidden');
+    }
 }
 
 // ========== LOAD BEHAVIOR DATA ==========
