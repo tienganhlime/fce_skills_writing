@@ -637,9 +637,18 @@ async function viewStudentDetail(studentCode) {
 }
 
 // ========== DISPLAY STUDENT DETAIL ==========
+// ========== DISPLAY STUDENT DETAIL (FIXED VERSION) ==========
 function displayStudentDetail(data) {
-    // Kiểm tra cấu trúc dữ liệu
+    // ✅ KIỂM TRA DỮ LIỆU TRƯỚC
+    if (!data) {
+        console.error('No data received');
+        alert('❌ Không có dữ liệu!');
+        backToDashboard();
+        return;
+    }
+
     if (!data.work) {
+        console.error('No work data:', data);
         alert('❌ Dữ liệu không hợp lệ!');
         backToDashboard();
         return;
@@ -649,48 +658,82 @@ function displayStudentDetail(data) {
     const aiStatus = data.aiStatus || 'PENDING';
     const feedbackSource = data.feedbackSource || 'pending';
     
-    // Chọn feedback (ưu tiên Teacher > AI)
+    // Chọn feedback (Ưu tiên Teacher > AI)
     let feedback = data.teacherFeedback || data.aiFeedback;
     
-    // Header info
-    document.getElementById('reviewStudentName').textContent = work.studentName || 'N/A';
-    document.getElementById('reviewStudentCode').textContent = work.studentCode || 'N/A';
-    document.getElementById('reviewTimestamp').textContent = work.timestamp || '--';
-    document.getElementById('reviewTime').textContent = work.totalTime || '--';
+    // ✅ HELPER FUNCTION - Set text an toàn
+    function safeSetText(elementId, value) {
+        const element = document.getElementById(elementId);
+        if (element) {
+            element.textContent = value || '(Không có)';
+        } else {
+            console.warn(`Element not found: ${elementId}`);
+        }
+    }
     
-    // Hiển thị trạng thái AI
+    function safeSetHTML(elementId, value) {
+        const element = document.getElementById(elementId);
+        if (element) {
+            element.innerHTML = value || '<p class="text-gray-500 italic">Chưa có dữ liệu</p>';
+        } else {
+            console.warn(`Element not found: ${elementId}`);
+        }
+    }
+    
+    function safeSetValue(elementId, value) {
+        const element = document.getElementById(elementId);
+        if (element) {
+            element.value = value || 0;
+        } else {
+            console.warn(`Element not found: ${elementId}`);
+        }
+    }
+    
+    // ========== HEADER INFO ==========
+    safeSetText('reviewStudentName', work.studentName || 'N/A');
+    safeSetText('reviewStudentCode', work.studentCode || 'N/A');
+    safeSetText('reviewTimestamp', work.timestamp || '--');
+    safeSetText('reviewTime', work.totalTime || '--');
+    
+    // ========== HIỂN THỊ TRẠNG THÁI AI ==========
     showAIStatus(aiStatus, feedbackSource);
     
-    // Hiển thị đề bài
+    // ========== HIỂN THỊ ĐỀ BÀI ==========
     const weekTopics = TOPICS[currentWeek] || TOPICS[1];
-    document.getElementById('topic1Prompt').textContent = weekTopics.topic1.prompt;
-    document.getElementById('topic2Prompt').textContent = weekTopics.topic2.prompt;
+    if (weekTopics) {
+        safeSetText('topic1Prompt', weekTopics.topic1.prompt);
+        safeSetText('topic2Prompt', weekTopics.topic2.prompt);
+    }
     
-    // Topic 1 - Student work
-    document.getElementById('t1_ss').textContent = work.topic1?.ss || '(Không có)';
-    document.getElementById('t1_is').textContent = work.topic1?.is || '(Không có)';
-    document.getElementById('t1_q').textContent = work.topic1?.q || '(Không có)';
-    document.getElementById('t1_t').textContent = work.topic1?.t || '(Không có)';
-    document.getElementById('t1_body1').textContent = work.topic1?.body1 || '(Không có)';
-    document.getElementById('t1_body2').textContent = work.topic1?.body2 || '(Không có)';
-    document.getElementById('t1_body3').textContent = work.topic1?.body3 || '(Không có)';
-    document.getElementById('t1_intro').textContent = work.topic1?.introduction || '(Không có)';
-    document.getElementById('t1_wordcount').textContent = work.topic1?.wordCount || 0;
-    document.getElementById('t1_time').textContent = work.topic1?.timeUsed || '--';
+    // ========== TOPIC 1 - STUDENT WORK ==========
+    if (work.topic1) {
+        safeSetText('t1_ss', work.topic1.ss);
+        safeSetText('t1_is', work.topic1.is);
+        safeSetText('t1_q', work.topic1.q);
+        safeSetText('t1_t', work.topic1.t);
+        safeSetText('t1_body1', work.topic1.body1);
+        safeSetText('t1_body2', work.topic1.body2);
+        safeSetText('t1_body3', work.topic1.body3);
+        safeSetText('t1_intro', work.topic1.introduction);
+        safeSetText('t1_wordcount', work.topic1.wordCount || 0);
+        safeSetText('t1_time', work.topic1.timeUsed);
+    }
     
-    // Topic 2 - Student work
-    document.getElementById('t2_ss').textContent = work.topic2?.ss || '(Không có)';
-    document.getElementById('t2_is').textContent = work.topic2?.is || '(Không có)';
-    document.getElementById('t2_q').textContent = work.topic2?.q || '(Không có)';
-    document.getElementById('t2_t').textContent = work.topic2?.t || '(Không có)';
-    document.getElementById('t2_body1').textContent = work.topic2?.body1 || '(Không có)';
-    document.getElementById('t2_body2').textContent = work.topic2?.body2 || '(Không có)';
-    document.getElementById('t2_body3').textContent = work.topic2?.body3 || '(Không có)';
-    document.getElementById('t2_intro').textContent = work.topic2?.introduction || '(Không có)';
-    document.getElementById('t2_wordcount').textContent = work.topic2?.wordCount || 0;
-    document.getElementById('t2_time').textContent = work.topic2?.timeUsed || '--';
+    // ========== TOPIC 2 - STUDENT WORK ==========
+    if (work.topic2) {
+        safeSetText('t2_ss', work.topic2.ss);
+        safeSetText('t2_is', work.topic2.is);
+        safeSetText('t2_q', work.topic2.q);
+        safeSetText('t2_t', work.topic2.t);
+        safeSetText('t2_body1', work.topic2.body1);
+        safeSetText('t2_body2', work.topic2.body2);
+        safeSetText('t2_body3', work.topic2.body3);
+        safeSetText('t2_intro', work.topic2.introduction);
+        safeSetText('t2_wordcount', work.topic2.wordCount || 0);
+        safeSetText('t2_time', work.topic2.timeUsed);
+    }
     
-    // Load feedback dựa trên trạng thái
+    // ========== LOAD FEEDBACK ==========
     if (feedback) {
         loadFeedback(feedback, feedbackSource === 'teacher');
     } else {
@@ -698,10 +741,11 @@ function displayStudentDetail(data) {
         setPlaceholderFeedback(aiStatus);
     }
     
-    // Show first tab
+    // ========== SHOW FIRST TAB ==========
     switchTab('topic1');
+    
+    console.log('✅ Display completed successfully');
 }
-
 // ========== HIỂN THỊ TRẠNG THÁI AI ==========
 function showAIStatus(aiStatus, feedbackSource) {
     const header = document.querySelector('#reviewScreen .bg-white.rounded-2xl.shadow-2xl > div');
