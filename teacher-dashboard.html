@@ -514,11 +514,38 @@
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzIp9jfs0GEOh_Y-0AnBBXXaX4AjsMHHW7SkZjDjJwtXFHicIqXyddq9IOZmEijXuu-Fg/exec';
 const TEACHER_PASSWORD = 'lime2025';
 
+// ========== ĐỀ BÀI ==========
+const TOPICS = {
+    1: {
+        topic1: {
+            title: "APPEARANCE & SOCIETY",
+            prompt: `"We are much too worried about how people and things look. Do you agree?"
+            
+Points to consider:
+• being like your friends
+• the effect of celebrities
+• your own idea`,
+            fullPrompt: "Many people believe that in modern society, we place too much emphasis on appearance - how people look, what they wear, and how things appear on the surface. Some argue this focus on looks comes from wanting to fit in with friends, the influence of celebrities and social media, and societal pressure to maintain certain standards. Do you agree that we are too concerned with appearances?"
+        },
+        topic2: {
+            title: "STUDENTS & SCHOOL DECISIONS",
+            prompt: `"Do you think that students should help to make decisions about what happens at school?"
+            
+Points to consider:
+• the subjects children study
+• school rules
+• your own idea`,
+            fullPrompt: "There is ongoing debate about whether students should have a voice in school decisions. Some believe students should participate in choosing subjects they study, creating school rules, and other aspects of school life. Others think these decisions should remain with teachers and administrators. What is your opinion on student involvement in school decision-making?"
+        }
+    }
+};
+
 // ========== GLOBAL VARIABLES ==========
 let currentWeek = 1;
 let currentStudent = null;
 let allStudents = [];
 let originalFeedback = {}; // Lưu feedback gốc để so sánh
+let studentBehaviorData = null; // Lưu behavior data
 
 // ========== PASSWORD VERIFICATION ==========
 function verifyPassword() {
@@ -869,7 +896,142 @@ function switchTab(tabName) {
     } else if (tabName === 'behavior') {
         document.getElementById('behaviorContent').classList.remove('hidden');
         document.getElementById('tab3').classList.add('active');
+        // Load behavior data when tab is opened
+        loadBehaviorData();
     }
+}
+
+// ========== LOAD BEHAVIOR DATA ==========
+function loadBehaviorData() {
+    if (!studentBehaviorData) {
+        document.getElementById('timeBreakdown').innerHTML = '<p class="text-gray-500">Không có dữ liệu</p>';
+        document.getElementById('editStats').innerHTML = '<p class="text-gray-500">Không có dữ liệu</p>';
+        return;
+    }
+    
+    // Time breakdown
+    const timeHtml = `
+        <div class="space-y-2">
+            <p class="text-sm font-semibold text-gray-700">Đề 1:</p>
+            <div class="bg-white rounded p-2 text-sm">
+                <p>• SS: ${formatTime(studentBehaviorData.t1_ss?.time || 0)}</p>
+                <p>• IS: ${formatTime(studentBehaviorData.t1_is?.time || 0)}</p>
+                <p>• Q: ${formatTime(studentBehaviorData.t1_q?.time || 0)}</p>
+                <p>• T: ${formatTime(studentBehaviorData.t1_t?.time || 0)}</p>
+                <p>• Body 1: ${formatTime(studentBehaviorData.t1_body1?.time || 0)}</p>
+                <p>• Body 2: ${formatTime(studentBehaviorData.t1_body2?.time || 0)}</p>
+                <p>• Body 3: ${formatTime(studentBehaviorData.t1_body3?.time || 0)}</p>
+                <p class="font-bold mt-1">• Mở bài: ${formatTime(studentBehaviorData.t1_intro?.time || 0)}</p>
+            </div>
+            
+            <p class="text-sm font-semibold text-gray-700 mt-4">Đề 2:</p>
+            <div class="bg-white rounded p-2 text-sm">
+                <p>• SS: ${formatTime(studentBehaviorData.t2_ss?.time || 0)}</p>
+                <p>• IS: ${formatTime(studentBehaviorData.t2_is?.time || 0)}</p>
+                <p>• Q: ${formatTime(studentBehaviorData.t2_q?.time || 0)}</p>
+                <p>• T: ${formatTime(studentBehaviorData.t2_t?.time || 0)}</p>
+                <p>• Body 1: ${formatTime(studentBehaviorData.t2_body1?.time || 0)}</p>
+                <p>• Body 2: ${formatTime(studentBehaviorData.t2_body2?.time || 0)}</p>
+                <p>• Body 3: ${formatTime(studentBehaviorData.t2_body3?.time || 0)}</p>
+                <p class="font-bold mt-1">• Mở bài: ${formatTime(studentBehaviorData.t2_intro?.time || 0)}</p>
+            </div>
+        </div>
+    `;
+    document.getElementById('timeBreakdown').innerHTML = timeHtml;
+    
+    // Edit & Paste stats
+    const t1Edits = (studentBehaviorData.t1_ss?.edits || 0) + 
+                    (studentBehaviorData.t1_is?.edits || 0) +
+                    (studentBehaviorData.t1_q?.edits || 0) +
+                    (studentBehaviorData.t1_t?.edits || 0) +
+                    (studentBehaviorData.t1_body1?.edits || 0) +
+                    (studentBehaviorData.t1_body2?.edits || 0) +
+                    (studentBehaviorData.t1_body3?.edits || 0) +
+                    (studentBehaviorData.t1_intro?.edits || 0);
+    
+    const t2Edits = (studentBehaviorData.t2_ss?.edits || 0) + 
+                    (studentBehaviorData.t2_is?.edits || 0) +
+                    (studentBehaviorData.t2_q?.edits || 0) +
+                    (studentBehaviorData.t2_t?.edits || 0) +
+                    (studentBehaviorData.t2_body1?.edits || 0) +
+                    (studentBehaviorData.t2_body2?.edits || 0) +
+                    (studentBehaviorData.t2_body3?.edits || 0) +
+                    (studentBehaviorData.t2_intro?.edits || 0);
+    
+    const t1Pastes = (studentBehaviorData.t1_ss?.pastes || 0) + 
+                     (studentBehaviorData.t1_is?.pastes || 0) +
+                     (studentBehaviorData.t1_q?.pastes || 0) +
+                     (studentBehaviorData.t1_t?.pastes || 0) +
+                     (studentBehaviorData.t1_body1?.pastes || 0) +
+                     (studentBehaviorData.t1_body2?.pastes || 0) +
+                     (studentBehaviorData.t1_body3?.pastes || 0) +
+                     (studentBehaviorData.t1_intro?.pastes || 0);
+    
+    const t2Pastes = (studentBehaviorData.t2_ss?.pastes || 0) + 
+                     (studentBehaviorData.t2_is?.pastes || 0) +
+                     (studentBehaviorData.t2_q?.pastes || 0) +
+                     (studentBehaviorData.t2_t?.pastes || 0) +
+                     (studentBehaviorData.t2_body1?.pastes || 0) +
+                     (studentBehaviorData.t2_body2?.pastes || 0) +
+                     (studentBehaviorData.t2_body3?.pastes || 0) +
+                     (studentBehaviorData.t2_intro?.pastes || 0);
+    
+    const totalEdits = t1Edits + t2Edits;
+    const totalPastes = t1Pastes + t2Pastes;
+    
+    const editHtml = `
+        <div class="space-y-3">
+            <div class="bg-white rounded p-3">
+                <p class="font-semibold text-gray-800 mb-2">✏️ Tổng số lần chỉnh sửa:</p>
+                <p class="text-2xl font-bold ${totalEdits > 20 ? 'text-orange-600' : 'text-green-600'}">
+                    ${totalEdits} lần
+                </p>
+                <p class="text-sm text-gray-600 mt-1">
+                    Đề 1: ${t1Edits} | Đề 2: ${t2Edits}
+                </p>
+            </div>
+            
+            <div class="bg-white rounded p-3">
+                <p class="font-semibold text-gray-800 mb-2">📋 Tổng số lần paste:</p>
+                <p class="text-2xl font-bold ${totalPastes > 5 ? 'text-red-600' : totalPastes > 0 ? 'text-yellow-600' : 'text-green-600'}">
+                    ${totalPastes} lần ${totalPastes === 0 ? '✅' : totalPastes > 5 ? '⚠️' : ''}
+                </p>
+                <p class="text-sm text-gray-600 mt-1">
+                    Đề 1: ${t1Pastes} | Đề 2: ${t2Pastes}
+                </p>
+            </div>
+            
+            <div class="bg-white rounded p-3">
+                <p class="font-semibold text-gray-800 mb-2">📊 Chi tiết mở bài:</p>
+                <div class="text-sm space-y-1">
+                    <p>Đề 1 - Edits: <strong>${studentBehaviorData.t1_intro?.edits || 0}</strong> | Pastes: <strong>${studentBehaviorData.t1_intro?.pastes || 0}</strong></p>
+                    <p>Đề 2 - Edits: <strong>${studentBehaviorData.t2_intro?.edits || 0}</strong> | Pastes: <strong>${studentBehaviorData.t2_intro?.pastes || 0}</strong></p>
+                </div>
+            </div>
+            
+            ${totalPastes > 5 ? `
+                <div class="bg-red-50 border border-red-200 rounded p-3">
+                    <p class="text-red-700 text-sm font-semibold">⚠️ Cảnh báo:</p>
+                    <p class="text-red-600 text-sm">Học sinh có số lần paste cao, cần kiểm tra xem có copy từ nguồn khác không.</p>
+                </div>
+            ` : ''}
+        </div>
+    `;
+    document.getElementById('editStats').innerHTML = editHtml;
+}
+
+// ========== FORMAT TIME ==========
+function formatTime(milliseconds) {
+    if (!milliseconds || milliseconds === 0) return '0s';
+    
+    const seconds = Math.floor(milliseconds / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    
+    if (minutes > 0) {
+        return `${minutes}p ${remainingSeconds}s`;
+    }
+    return `${seconds}s`;
 }
 
 // ========== SAVE EDITS ==========

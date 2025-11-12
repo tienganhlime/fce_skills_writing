@@ -43,6 +43,14 @@
             border-color: #4CAF50 !important;
             box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
         }
+        .topic-prompt {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        .topic-prompt.expanded {
+            max-height: 500px;
+        }
     </style>
 </head>
 <body>
@@ -62,11 +70,11 @@
             <div class="bg-green-50 rounded-xl p-6 mb-6">
                 <h2 class="text-2xl font-bold text-green-800 mb-4">FCE WRITING - WEEK 1</h2>
                 <div class="space-y-2 text-green-700">
-                    <p>✍️ Đề 1: We are much too worried about how people and things look</p>
-                    <p>✍️ Đề 2: Students should help to make decisions about what happens at school</p>
+                    <p>✏️ Đề 1: We are much too worried about how people and things look</p>
+                    <p>✏️ Đề 2: Students should help to make decisions about what happens at school</p>
                     <p>📝 Phân tích đề (SS, IS, Q, T + Outline)</p>
                     <p>📄 Viết mở bài (50-70 words)</p>
-                    <p>🔍 Hệ thống theo dõi hành vi làm bài</p>
+                    <p>📊 Hệ thống theo dõi hành vi làm bài</p>
                 </div>
             </div>
 
@@ -141,9 +149,22 @@
 
             <!-- Đề bài đầy đủ -->
             <div class="bg-blue-50 border-l-4 border-blue-600 p-5 mb-6 rounded-r-lg">
-                <h3 class="font-bold text-blue-800 mb-3 text-lg">📋 Essay Topic:</h3>
-                <p class="text-blue-900 mb-3 text-lg font-semibold">"We are much too worried about how people and things look. Do you agree?"</p>
-                <p class="text-blue-700 text-sm"><em>Points to consider: being like your friends / the effect of celebrities / your own idea</em></p>
+                <div class="flex justify-between items-start">
+                    <div class="flex-1">
+                        <h3 class="font-bold text-blue-800 mb-3 text-lg">📋 Essay Topic:</h3>
+                        <p class="text-blue-900 mb-3 text-lg font-semibold">"We are much too worried about how people and things look. Do you agree?"</p>
+                        <p class="text-blue-700 text-sm"><em>Points to consider: being like your friends / the effect of celebrities / your own idea</em></p>
+                    </div>
+                    <button onclick="togglePrompt('topic1')" class="ml-4 text-blue-600 hover:text-blue-800 font-semibold text-sm whitespace-nowrap">
+                        [Xem thêm ▼]
+                    </button>
+                </div>
+                
+                <div id="topic1Prompt" class="topic-prompt mt-4 pt-4 border-t border-blue-200">
+                    <p class="text-blue-800 text-sm leading-relaxed">
+                        Many people believe that in modern society, we place too much emphasis on appearance - how people look, what they wear, and how things appear on the surface. Some argue this focus on looks comes from wanting to fit in with friends, the influence of celebrities and social media, and societal pressure to maintain certain standards. Do you agree that we are too concerned with appearances?
+                    </p>
+                </div>
             </div>
 
             <!-- Phân tích đề -->
@@ -240,9 +261,22 @@
 
             <!-- Đề bài đầy đủ -->
             <div class="bg-purple-50 border-l-4 border-purple-600 p-5 mb-6 rounded-r-lg">
-                <h3 class="font-bold text-purple-800 mb-3 text-lg">📋 Essay Topic:</h3>
-                <p class="text-purple-900 mb-3 text-lg font-semibold">"Do you think that students should help to make decisions about what happens at school?"</p>
-                <p class="text-purple-700 text-sm"><em>Points to consider: the subject children study / school rules / your own idea</em></p>
+                <div class="flex justify-between items-start">
+                    <div class="flex-1">
+                        <h3 class="font-bold text-purple-800 mb-3 text-lg">📋 Essay Topic:</h3>
+                        <p class="text-purple-900 mb-3 text-lg font-semibold">"Do you think that students should help to make decisions about what happens at school?"</p>
+                        <p class="text-purple-700 text-sm"><em>Points to consider: the subjects children study / school rules / your own idea</em></p>
+                    </div>
+                    <button onclick="togglePrompt('topic2')" class="ml-4 text-purple-600 hover:text-purple-800 font-semibold text-sm whitespace-nowrap">
+                        [Xem thêm ▼]
+                    </button>
+                </div>
+                
+                <div id="topic2Prompt" class="topic-prompt mt-4 pt-4 border-t border-purple-200">
+                    <p class="text-purple-800 text-sm leading-relaxed">
+                        There is ongoing debate about whether students should have a voice in school decisions. Some believe students should participate in choosing subjects they study, creating school rules, and other aspects of school life. Others think these decisions should remain with teachers and administrators. What is your opinion on student involvement in school decision-making?
+                    </p>
+                </div>
             </div>
 
             <!-- Phân tích đề -->
@@ -440,6 +474,12 @@ let behaviorData = {
 
 let fieldTimers = {};
 
+// ========== TOGGLE PROMPT ==========
+function togglePrompt(topicId) {
+    const prompt = document.getElementById(topicId + 'Prompt');
+    prompt.classList.toggle('expanded');
+}
+
 // ========== STUDENT VERIFICATION ==========
 async function verifyStudent() {
     const code = document.getElementById('studentCode').value.trim().toUpperCase();
@@ -503,7 +543,6 @@ function stopTimer() {
 
 // ========== BEHAVIOR TRACKING ==========
 function initializeTracking() {
-    // Track all inputs and textareas
     const fields = document.querySelectorAll('[data-field]');
     
     fields.forEach(field => {
@@ -548,7 +587,7 @@ function initializeTracking() {
             console.log(`Paste detected in ${fieldId}: ${behaviorData[fieldId].pastes} times`);
         });
         
-        // Edit tracking (significant changes)
+        // Edit tracking
         field.addEventListener('input', () => {
             clearTimeout(typingTimer);
             
@@ -576,7 +615,7 @@ function initializeTracking() {
                 }
                 
                 updateProgress();
-            }, 500); // Wait 500ms after typing stops
+            }, 500);
         });
     });
 }
@@ -706,75 +745,75 @@ async function submitTest() {
     }).length / requiredFields.length) * 100);
     
     // Data to send
-  const dataToSend = {
-    studentCode: studentInfo.code,
-    studentName: studentInfo.name,
-    weekNumber: WEEK_NUMBER,
-    examType: 'essay',
-    totalTimeSeconds: elapsedSeconds,
+    const dataToSend = {
+        studentCode: studentInfo.code,
+        studentName: studentInfo.name,
+        weekNumber: WEEK_NUMBER,
+        examType: 'essay',
+        totalTimeSeconds: elapsedSeconds,
 
-    // === TOPIC 1 ===
-    topic1: {
-        ss: answers.t1_ss || '',
-        is: answers.t1_is || '',
-        q: answers.t1_q || '',
-        t: answers.t1_t || '',
-        body1: answers.t1_body1 || '',
-        body2: answers.t1_body2 || '',
-        body3: answers.t1_body3 || '',  // ← Đảm bảo có
-        introduction: answers.t1_intro || '',
-        wordCount: t1IntroWords,
-        timeSeconds: Math.round((
-            behaviorData.t1_ss.time +
-            behaviorData.t1_is.time +
-            behaviorData.t1_q.time +
-            behaviorData.t1_t.time +
-            behaviorData.t1_body1.time +
-            behaviorData.t1_body2.time +
-            behaviorData.t1_body3.time +
-            behaviorData.t1_intro.time
-        ) / 1000),
-        keystrokeLog: {} // nếu sau này cần log chi tiết hơn
-    },
+        // === TOPIC 1 ===
+        topic1: {
+            ss: answers.t1_ss || '',
+            is: answers.t1_is || '',
+            q: answers.t1_q || '',
+            t: answers.t1_t || '',
+            body1: answers.t1_body1 || '',
+            body2: answers.t1_body2 || '',
+            body3: answers.t1_body3 || '',
+            introduction: answers.t1_intro || '',
+            wordCount: t1IntroWords,
+            timeSeconds: Math.round((
+                behaviorData.t1_ss.time +
+                behaviorData.t1_is.time +
+                behaviorData.t1_q.time +
+                behaviorData.t1_t.time +
+                behaviorData.t1_body1.time +
+                behaviorData.t1_body2.time +
+                behaviorData.t1_body3.time +
+                behaviorData.t1_intro.time
+            ) / 1000),
+            keystrokeLog: {}
+        },
 
-    // === TOPIC 2 ===
-    topic2: {
-        ss: answers.t2_ss || '',
-        is: answers.t2_is || '',
-        q: answers.t2_q || '',
-        t: answers.t2_t || '',
-        body1: answers.t2_body1 || '',
-        body2: answers.t2_body2 || '',
-        body3: answers.t2_body3 || '',  // ← Đảm bảo có
-        introduction: answers.t2_intro || '',
-        wordCount: t2IntroWords,
-        timeSeconds: Math.round((
-            behaviorData.t2_ss.time +
-            behaviorData.t2_is.time +
-            behaviorData.t2_q.time +
-            behaviorData.t2_t.time +
-            behaviorData.t2_body1.time +
-            behaviorData.t2_body2.time +
-            behaviorData.t2_body3.time +
-            behaviorData.t2_intro.time
-        ) / 1000),
-        keystrokeLog: {}
-    },
+        // === TOPIC 2 ===
+        topic2: {
+            ss: answers.t2_ss || '',
+            is: answers.t2_is || '',
+            q: answers.t2_q || '',
+            t: answers.t2_t || '',
+            body1: answers.t2_body1 || '',
+            body2: answers.t2_body2 || '',
+            body3: answers.t2_body3 || '',
+            introduction: answers.t2_intro || '',
+            wordCount: t2IntroWords,
+            timeSeconds: Math.round((
+                behaviorData.t2_ss.time +
+                behaviorData.t2_is.time +
+                behaviorData.t2_q.time +
+                behaviorData.t2_t.time +
+                behaviorData.t2_body1.time +
+                behaviorData.t2_body2.time +
+                behaviorData.t2_body3.time +
+                behaviorData.t2_intro.time
+            ) / 1000),
+            keystrokeLog: {}
+        },
 
-    // === THỐNG KÊ & HÀNH VI (GIỮ NGUYÊN) ===
-    totalPastes: totalPastes,
-    totalEdits: totalEdits,
-    behaviorData: behaviorData,           // ← Object đầy đủ 16 field
-    timeBreakdown: timeBreakdown,         // ← Thời gian từng phần (giây)
+        // === THỐNG KÊ & HÀNH VI ===
+        totalPastes: totalPastes,
+        totalEdits: totalEdits,
+        behaviorData: behaviorData,
+        timeBreakdown: timeBreakdown,
 
-    // === DETAILED LOGS (nếu muốn giữ riêng) ===
-    detailedLogs: {
-        t1_intro_edits: behaviorData.t1_intro.edits,
-        t1_intro_pastes: behaviorData.t1_intro.pastes,
-        t2_intro_edits: behaviorData.t2_intro.edits,
-        t2_intro_pastes: behaviorData.t2_intro.pastes
-    }
-};
+        // === DETAILED LOGS ===
+        detailedLogs: {
+            t1_intro_edits: behaviorData.t1_intro.edits,
+            t1_intro_pastes: behaviorData.t1_intro.pastes,
+            t2_intro_edits: behaviorData.t2_intro.edits,
+            t2_intro_pastes: behaviorData.t2_intro.pastes
+        }
+    };
     
     try {
         await fetch(GOOGLE_SCRIPT_URL, {
@@ -853,15 +892,7 @@ function showResults(completionPercent, timeUsed, totalWords, totalPastes, total
     document.getElementById('behaviorStats').innerHTML = behaviorHtml;
 }
 
-// ========== PREVENT CONTEXT MENU (optional - anti-cheat) ==========
-document.addEventListener('contextmenu', (e) => {
-    if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') {
-        // Allow right-click for spell check
-        return true;
-    }
-});
-
-// ========== AUTO-SAVE (optional) ==========
+// ========== AUTO-SAVE ==========
 setInterval(() => {
     if (studentInfo.code) {
         const allFields = Object.keys(behaviorData);
