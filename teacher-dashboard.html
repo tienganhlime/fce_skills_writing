@@ -609,13 +609,24 @@ function updateStats(students) {
 }
 
 // ========== VIEW STUDENT DETAIL ==========
+// ========== VIEW STUDENT DETAIL (FIXED) ==========
 async function viewStudentDetail(studentCode) {
     currentStudent = studentCode;
     
+    // ⭐ CHUYỂN SCREEN TRƯỚC - ĐÂY LÀ KEY FIX
     document.getElementById('dashboardScreen').classList.add('hidden');
     document.getElementById('reviewScreen').classList.remove('hidden');
     
-    showLoading('tabContent', 'Đang tải chi tiết...');
+    // Hiển thị loading
+    const tabContent = document.getElementById('tabContent');
+    if (tabContent) {
+        tabContent.innerHTML = `
+            <div class="text-center py-12">
+                <div class="spinner mx-auto mb-4"></div>
+                <p class="text-gray-600">Đang tải chi tiết...</p>
+            </div>
+        `;
+    }
     
     try {
         const response = await fetch(
@@ -623,21 +634,22 @@ async function viewStudentDetail(studentCode) {
         );
         const data = await response.json();
         
+        console.log('📥 API Response:', data);
+        
         if (data.status === 'success') {
             currentStudentData = data;
-            displayStudentDetail(data);
+            displayStudentDetail(data); // ← Gọi sau khi screen đã chuyển
         } else {
             throw new Error(data.message || 'Không thể tải dữ liệu');
         }
     } catch (error) {
-        console.error('Error:', error);
-        alert('❌ Lỗi khi tải dữ liệu học sinh!');
+        console.error('❌ Error:', error);
+        alert('❌ Lỗi khi tải dữ liệu học sinh: ' + error.message);
         backToDashboard();
     }
 }
-
 // ========== DISPLAY STUDENT DETAIL ==========
-// ========== DISPLAY STUDENT DETAIL (FIXED VERSION) ==========
+// ========== DISPLAY STUDENT DETAIL (FIXED - V2) ==========
 function displayStudentDetail(data) {
     // ✅ KIỂM TRA DỮ LIỆU TRƯỚC
     if (!data) {
@@ -661,13 +673,15 @@ function displayStudentDetail(data) {
     // Chọn feedback (Ưu tiên Teacher > AI)
     let feedback = data.teacherFeedback || data.aiFeedback;
     
+    console.log('📊 Data received:', { work, aiStatus, feedbackSource, feedback });
+    
     // ✅ HELPER FUNCTION - Set text an toàn
     function safeSetText(elementId, value) {
         const element = document.getElementById(elementId);
         if (element) {
             element.textContent = value || '(Không có)';
         } else {
-            console.warn(`Element not found: ${elementId}`);
+            console.warn(`⚠️ Element not found: ${elementId}`);
         }
     }
     
@@ -676,7 +690,7 @@ function displayStudentDetail(data) {
         if (element) {
             element.innerHTML = value || '<p class="text-gray-500 italic">Chưa có dữ liệu</p>';
         } else {
-            console.warn(`Element not found: ${elementId}`);
+            console.warn(`⚠️ Element not found: ${elementId}`);
         }
     }
     
@@ -685,67 +699,75 @@ function displayStudentDetail(data) {
         if (element) {
             element.value = value || 0;
         } else {
-            console.warn(`Element not found: ${elementId}`);
+            console.warn(`⚠️ Element not found: ${elementId}`);
         }
     }
     
-    // ========== HEADER INFO ==========
-    safeSetText('reviewStudentName', work.studentName || 'N/A');
-    safeSetText('reviewStudentCode', work.studentCode || 'N/A');
-    safeSetText('reviewTimestamp', work.timestamp || '--');
-    safeSetText('reviewTime', work.totalTime || '--');
-    
-    // ========== HIỂN THỊ TRẠNG THÁI AI ==========
-    showAIStatus(aiStatus, feedbackSource);
-    
-    // ========== HIỂN THỊ ĐỀ BÀI ==========
-    const weekTopics = TOPICS[currentWeek] || TOPICS[1];
-    if (weekTopics) {
-        safeSetText('topic1Prompt', weekTopics.topic1.prompt);
-        safeSetText('topic2Prompt', weekTopics.topic2.prompt);
-    }
-    
-    // ========== TOPIC 1 - STUDENT WORK ==========
-    if (work.topic1) {
-        safeSetText('t1_ss', work.topic1.ss);
-        safeSetText('t1_is', work.topic1.is);
-        safeSetText('t1_q', work.topic1.q);
-        safeSetText('t1_t', work.topic1.t);
-        safeSetText('t1_body1', work.topic1.body1);
-        safeSetText('t1_body2', work.topic1.body2);
-        safeSetText('t1_body3', work.topic1.body3);
-        safeSetText('t1_intro', work.topic1.introduction);
-        safeSetText('t1_wordcount', work.topic1.wordCount || 0);
-        safeSetText('t1_time', work.topic1.timeUsed);
-    }
-    
-    // ========== TOPIC 2 - STUDENT WORK ==========
-    if (work.topic2) {
-        safeSetText('t2_ss', work.topic2.ss);
-        safeSetText('t2_is', work.topic2.is);
-        safeSetText('t2_q', work.topic2.q);
-        safeSetText('t2_t', work.topic2.t);
-        safeSetText('t2_body1', work.topic2.body1);
-        safeSetText('t2_body2', work.topic2.body2);
-        safeSetText('t2_body3', work.topic2.body3);
-        safeSetText('t2_intro', work.topic2.introduction);
-        safeSetText('t2_wordcount', work.topic2.wordCount || 0);
-        safeSetText('t2_time', work.topic2.timeUsed);
-    }
-    
-    // ========== LOAD FEEDBACK ==========
-    if (feedback) {
-        loadFeedback(feedback, feedbackSource === 'teacher');
-    } else {
-        // AI chưa chấm xong
-        setPlaceholderFeedback(aiStatus);
-    }
-    
-    // ========== SHOW FIRST TAB ==========
-    switchTab('topic1');
-    
-    console.log('✅ Display completed successfully');
+    // ========== CHUYỂN SANG REVIEW SCREEN TRƯỚC ==========
+    // ⭐ ĐÂY LÀ KEY FIX - Đợi DOM render xong
+    setTimeout(() => {
+        console.log('🔄 Setting data after screen transition...');
+        
+        // ========== HEADER INFO ==========
+        safeSetText('reviewStudentName', work.studentName || 'N/A');
+        safeSetText('reviewStudentCode', work.studentCode || 'N/A');
+        safeSetText('reviewTimestamp', work.timestamp || '--');
+        safeSetText('reviewTime', work.totalTime || '--');
+        
+        // ========== HIỂN THỊ TRẠNG THÁI AI ==========
+        showAIStatus(aiStatus, feedbackSource);
+        
+        // ========== HIỂN THỊ ĐỀ BÀI ==========
+        const weekTopics = TOPICS[currentWeek] || TOPICS[1];
+        if (weekTopics) {
+            safeSetText('topic1Prompt', weekTopics.topic1.prompt);
+            safeSetText('topic2Prompt', weekTopics.topic2.prompt);
+        }
+        
+        // ========== TOPIC 1 - STUDENT WORK ==========
+        if (work.topic1) {
+            safeSetText('t1_ss', work.topic1.ss);
+            safeSetText('t1_is', work.topic1.is);
+            safeSetText('t1_q', work.topic1.q);
+            safeSetText('t1_t', work.topic1.t);
+            safeSetText('t1_body1', work.topic1.body1);
+            safeSetText('t1_body2', work.topic1.body2);
+            safeSetText('t1_body3', work.topic1.body3);
+            safeSetText('t1_intro', work.topic1.introduction);
+            safeSetText('t1_wordcount', work.topic1.wordCount || 0);
+            safeSetText('t1_time', work.topic1.timeUsed);
+        }
+        
+        // ========== TOPIC 2 - STUDENT WORK ==========
+        if (work.topic2) {
+            safeSetText('t2_ss', work.topic2.ss);
+            safeSetText('t2_is', work.topic2.is);
+            safeSetText('t2_q', work.topic2.q);
+            safeSetText('t2_t', work.topic2.t);
+            safeSetText('t2_body1', work.topic2.body1);
+            safeSetText('t2_body2', work.topic2.body2);
+            safeSetText('t2_body3', work.topic2.body3);
+            safeSetText('t2_intro', work.topic2.introduction);
+            safeSetText('t2_wordcount', work.topic2.wordCount || 0);
+            safeSetText('t2_time', work.topic2.timeUsed);
+        }
+        
+        // ========== LOAD FEEDBACK ==========
+        if (feedback) {
+            loadFeedback(feedback, feedbackSource === 'teacher');
+        } else {
+            // AI chưa chấm xong
+            setPlaceholderFeedback(aiStatus);
+        }
+        
+        // ========== SHOW FIRST TAB ==========
+        switchTab('topic1');
+        
+        console.log('✅ Display completed successfully');
+        
+    }, 100); // Đợi 100ms để DOM render xong
 }
+
 // ========== HIỂN THỊ TRẠNG THÁI AI ==========
 function showAIStatus(aiStatus, feedbackSource) {
     const header = document.querySelector('#reviewScreen .bg-white.rounded-2xl.shadow-2xl > div');
