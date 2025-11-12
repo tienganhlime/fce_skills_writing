@@ -572,7 +572,7 @@ async function loadWeekData() {
         const data = await response.json();
         
         if (data.status === 'success') {
-            allStudents = data.students || [];
+            allStudents = data.submissions || data.students || [];
             displayStudentList(allStudents);
             updateStats(allStudents);
         } else {
