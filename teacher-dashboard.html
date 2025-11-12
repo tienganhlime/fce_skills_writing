@@ -339,7 +339,7 @@
       </div>
     `;
 
-    // === ĐỀ 2 === (Copy và chỉnh sửa tương tự cho topic2)
+    // === ĐỀ 2 ===
     const t2 = work.topic2;
     const fb2 = data.teacherFeedback?.topic2 || data.aiFeedback?.topic2 || {};
     const analysisFb2 = fb2.analysis_feedback || {};
@@ -489,16 +489,16 @@
         },
         introduction_score: currentFeedback.aiFeedback?.topic1.introduction_score || 0,
         introduction_feedback: {
-          strengths: document.getElementById('t1-strengths').value.split('\n'),
-          weaknesses: document.getElementById('t1-weaknesses').value.split('\n'),
-          grammar_errors: document.getElementById('t1-grammar').value.split('\n').map(line => {
-            const [error, correction] = line.split(' → ');
+          strengths: document.getElementById('t1-strengths').value.split('\n').filter(line => line.trim()),
+          weaknesses: document.getElementById('t1-weaknesses').value.split('\n').filter(line => line.trim()),
+          grammar_errors: document.getElementById('t1-grammar').value.split('\n').filter(line => line.trim()).map(line => {
+            const [error, correction] = line.split(' → ').map(s => s.trim());
             return {error, correction};
           })
         },
         cefr_level: currentFeedback.aiFeedback?.topic1.cefr_level || 'N/A',
         overall_comment: document.getElementById('t1-analysis-comment').value,
-        improvement_suggestions: document.getElementById('t1-suggestions').value.split('\n')
+        improvement_suggestions: document.getElementById('t1-suggestions').value.split('\n').filter(line => line.trim())
       },
       topic2: {
         // Tương tự cho topic2
@@ -508,16 +508,16 @@
         },
         introduction_score: currentFeedback.aiFeedback?.topic2.introduction_score || 0,
         introduction_feedback: {
-          strengths: document.getElementById('t2-strengths').value.split('\n'),
-          weaknesses: document.getElementById('t2-weaknesses').value.split('\n'),
-          grammar_errors: document.getElementById('t2-grammar').value.split('\n').map(line => {
-            const [error, correction] = line.split(' → ');
+          strengths: document.getElementById('t2-strengths').value.split('\n').filter(line => line.trim()),
+          weaknesses: document.getElementById('t2-weaknesses').value.split('\n').filter(line => line.trim()),
+          grammar_errors: document.getElementById('t2-grammar').value.split('\n').filter(line => line.trim()).map(line => {
+            const [error, correction] = line.split(' → ').map(s => s.trim());
             return {error, correction};
           })
         },
         cefr_level: currentFeedback.aiFeedback?.topic2.cefr_level || 'N/A',
         overall_comment: document.getElementById('t2-analysis-comment').value,
-        improvement_suggestions: document.getElementById('t2-suggestions').value.split('\n')
+        improvement_suggestions: document.getElementById('t2-suggestions').value.split('\n').filter(line => line.trim())
       }
     };
 
@@ -531,9 +531,22 @@
   }
 
   function exportPDF() {
-    const url = `${GOOGLE_SCRIPT_URL}?action=exportPDF&code=${currentStudent}&week=${currentWeek}`;
-    window.open(url, '_blank');
-  }
+  const url = `${GOOGLE_SCRIPT_URL}?action=exportPDF&code=${currentStudent}&week=${currentWeek}`;
+  
+  fetch(url)
+    .then(r => r.json())
+    .then(data => {
+      if (data.status === 'success') {
+        window.open(data.pdfUrl, '_blank');
+      } else {
+        alert('Lỗi xuất PDF: ' + data.message);
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      alert('Lỗi kết nối khi xuất PDF');
+    });
+}
 </script>
 
 </body>
