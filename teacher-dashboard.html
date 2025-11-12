@@ -568,7 +568,7 @@ async function loadWeekData() {
     showLoading('studentList', 'Đang tải dữ liệu...');
     
     try {
-        const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=getSubmittedStudents&week=${currentWeek}`);
+        const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=getSubmissions&week=${currentWeek}`);
         const data = await response.json();
         
         if (data.status === 'success') {
