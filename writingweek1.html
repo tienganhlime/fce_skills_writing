@@ -815,14 +815,11 @@ async function submitTest() {
     };
     
     try {
-        await fetch(GOOGLE_SCRIPT_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: { 
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(dataToSend)
-        });
+        await fetch(GOOGLE_SCRIPT_URL + '?weekNumber=' + WEEK_NUMBER, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify(dataToSend)
+});
         
         console.log('Dữ liệu đã gửi:', dataToSend);
         showResults(completionPercent, timeUsedDisplay, totalWords, totalPastes, totalEdits);
