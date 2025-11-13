@@ -70,8 +70,12 @@
             <div class="bg-green-50 rounded-xl p-6 mb-6">
                 <h2 class="text-2xl font-bold text-green-800 mb-4">FCE WRITING - WEEK 1</h2>
                 <div class="space-y-2 text-green-700">
-                    <p>✏️ Đề 1: We are much too worried about how people and things look</p>
-                    <p>✏️ Đề 2: Students should help to make decisions about what happens at school</p>
+                     <p>📌 Topic 1: Appearance & Society</p>
+    <p>📌 Topic 2: Students & School Decisions</p>
+    <p>📌 Topic 3: Technology & Happiness</p>
+    <p>📌 Topic 4: Opportunities for Young People</p>
+    <p>📌 Topic 5: Practical Life Skills in Schools</p>
+ <hr class="my-2 border-green-300">
                     <p>📝 Phân tích đề (SS, IS, Q, T + Outline)</p>
                     <p>📄 Viết mở bài (50-70 words)</p>
                     <p>📊 Hệ thống theo dõi hành vi làm bài</p>
@@ -131,7 +135,7 @@
             
             <div class="mt-4">
                 <div class="flex justify-between text-sm text-gray-600 mb-1">
-                    <span>Tiến độ: <span id="progressCount">0</span>/16 mục</span>
+                    <span>Tiến độ: <span id="progressCount">0</span>/40 mục</span>
                     <span id="progressPercent">0%</span>
                 </div>
                 <div class="w-full bg-gray-200 rounded-full h-3">
@@ -363,7 +367,341 @@
                 </div>
             </div>
         </div>
+<!-- TOPIC 3 -->
+        <div class="bg-white rounded-2xl shadow-2xl p-8 mb-6 fade-in">
+            <div class="bg-gradient-to-r from-teal-600 to-teal-500 text-white px-6 py-4 rounded-t-xl -mx-8 -mt-8 mb-6">
+                <h2 class="text-2xl font-bold">📝 TOPIC 3: TECHNOLOGY & HAPPINESS</h2>
+                <p class="text-sm opacity-90">Technology has made our lives easier but has it made us happier?</p>
+            </div>
 
+            <!-- Full prompt -->
+            <div class="bg-teal-50 border-l-4 border-teal-600 p-5 mb-6 rounded-r-lg">
+                <div class="flex justify-between items-start">
+                    <div class="flex-1">
+                        <h3 class="font-bold text-teal-800 mb-3 text-lg">📋 Essay Topic:</h3>
+                        <p class="text-teal-900 mb-3 text-lg font-semibold">"Technology has made our lives easier but has it made us happier? Do you agree?"</p>
+                        <p class="text-teal-700 text-sm"><em>Points to consider: social media impact / work-life balance / your own idea</em></p>
+                    </div>
+                    <button onclick="togglePrompt('topic3')" class="ml-4 text-teal-600 hover:text-teal-800 font-semibold text-sm whitespace-nowrap">
+                        [Show more ▼]
+                    </button>
+                </div>
+                
+                <div id="topic3Prompt" class="topic-prompt mt-4 pt-4 border-t border-teal-200">
+                    <p class="text-teal-800 text-sm leading-relaxed">
+                        Modern technology has transformed how we live, work, and communicate. While smartphones, computers, and the internet have made many tasks more convenient, questions remain about their impact on our overall happiness and well-being. Consider the effects of social media, changes in work-life balance, and other technological impacts on human happiness.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Essay Analysis -->
+            <div class="bg-gray-50 rounded-xl p-6 mb-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4 border-b-2 border-green-500 pb-2">PART 1: ESSAY ANALYSIS</h3>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">1. SS (Specific Subject): *</label>
+                        <input type="text" id="t3_ss" 
+                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg"
+                            placeholder="Are there any specific subjects?"
+                            data-field="t3_ss">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">2. IS (Independent Subject): *</label>
+                        <input type="text" id="t3_is" 
+                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg"
+                            placeholder="Are there any independent subjects?"
+                            data-field="t3_is">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">3. Q (Question): *</label>
+                        <input type="text" id="t3_q" 
+                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg"
+                            placeholder="What are the questions?"
+                            data-field="t3_q">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">4. T (Task): *</label>
+                        <input type="text" id="t3_t" 
+                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg"
+                            placeholder="How many tasks must we address?"
+                            data-field="t3_t">
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">Body 1: *</label>
+                            <input type="text" id="t3_body1" 
+                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg"
+                                placeholder="Idea 1"
+                                data-field="t3_body1">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">Body 2: *</label>
+                            <input type="text" id="t3_body2" 
+                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg"
+                                placeholder="Idea 2"
+                                data-field="t3_body2">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">Body 3: *</label>
+                            <input type="text" id="t3_body3" 
+                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg"
+                                placeholder="Your own idea"
+                                data-field="t3_body3">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Write Introduction -->
+            <div class="bg-gray-50 rounded-xl p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4 border-b-2 border-green-500 pb-2">PART 2: WRITE INTRODUCTION</h3>
+                
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Introduction Paragraph: *</label>
+                    <textarea id="t3_intro" rows="8"
+                        class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg resize-vertical"
+                        placeholder="Write your introduction here... (50-70 words recommended)"
+                        data-field="t3_intro"></textarea>
+                    <div class="flex justify-between items-center mt-2">
+                        <div class="text-sm text-gray-600">
+                            <span>✏️ Edits: <span id="t3_intro_edits" class="font-semibold">0</span></span>
+                            <span class="mx-2">|</span>
+                            <span id="t3_intro_paste_warning" class="text-red-600 font-semibold hidden">⚠️ Paste: <span id="t3_intro_pastes">0</span></span>
+                        </div>
+                        <div id="t3_intro_count" class="text-lg font-semibold text-gray-700">Words: 0 / 50-70</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TOPIC 4 -->
+        <div class="bg-white rounded-2xl shadow-2xl p-8 mb-6 fade-in">
+            <div class="bg-gradient-to-r from-orange-600 to-orange-500 text-white px-6 py-4 rounded-t-xl -mx-8 -mt-8 mb-6">
+                <h2 class="text-2xl font-bold">📝 TOPIC 4: OPPORTUNITIES FOR YOUNG PEOPLE</h2>
+                <p class="text-sm opacity-90">Young people today have more opportunities than their parents' generation</p>
+            </div>
+
+            <!-- Full prompt -->
+            <div class="bg-orange-50 border-l-4 border-orange-600 p-5 mb-6 rounded-r-lg">
+                <div class="flex justify-between items-start">
+                    <div class="flex-1">
+                        <h3 class="font-bold text-orange-800 mb-3 text-lg">📋 Essay Topic:</h3>
+                        <p class="text-orange-900 mb-3 text-lg font-semibold">"Young people today have more opportunities than their parents' generation. Do you agree?"</p>
+                        <p class="text-orange-700 text-sm"><em>Points to consider: education access / career choices / your own idea</em></p>
+                    </div>
+                    <button onclick="togglePrompt('topic4')" class="ml-4 text-orange-600 hover:text-orange-800 font-semibold text-sm whitespace-nowrap">
+                        [Show more ▼]
+                    </button>
+                </div>
+                
+                <div id="topic4Prompt" class="topic-prompt mt-4 pt-4 border-t border-orange-200">
+                    <p class="text-orange-800 text-sm leading-relaxed">
+                        Many argue that young people today have access to more opportunities than previous generations, particularly in education and career paths. With the internet, global connectivity, and diverse educational options, young people can pursue dreams that weren't available to their parents. However, some point to new challenges like increased competition and economic pressures.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Essay Analysis -->
+            <div class="bg-gray-50 rounded-xl p-6 mb-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4 border-b-2 border-green-500 pb-2">PART 1: ESSAY ANALYSIS</h3>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">1. SS (Specific Subject): *</label>
+                        <input type="text" id="t4_ss" 
+                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg"
+                            placeholder="Are there any specific subjects?"
+                            data-field="t4_ss">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">2. IS (Independent Subject): *</label>
+                        <input type="text" id="t4_is" 
+                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg"
+                            placeholder="Are there any independent subjects?"
+                            data-field="t4_is">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">3. Q (Question): *</label>
+                        <input type="text" id="t4_q" 
+                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg"
+                            placeholder="What are the questions?"
+                            data-field="t4_q">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">4. T (Task): *</label>
+                        <input type="text" id="t4_t" 
+                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg"
+                            placeholder="How many tasks must we address?"
+                            data-field="t4_t">
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">Body 1: *</label>
+                            <input type="text" id="t4_body1" 
+                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg"
+                                placeholder="Idea 1"
+                                data-field="t4_body1">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">Body 2: *</label>
+                            <input type="text" id="t4_body2" 
+                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg"
+                                placeholder="Idea 2"
+                                data-field="t4_body2">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">Body 3: *</label>
+                            <input type="text" id="t4_body3" 
+                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg"
+                                placeholder="Your own idea"
+                                data-field="t4_body3">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Write Introduction -->
+            <div class="bg-gray-50 rounded-xl p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4 border-b-2 border-green-500 pb-2">PART 2: WRITE INTRODUCTION</h3>
+                
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Introduction Paragraph: *</label>
+                    <textarea id="t4_intro" rows="8"
+                        class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg resize-vertical"
+                        placeholder="Write your introduction here... (50-70 words recommended)"
+                        data-field="t4_intro"></textarea>
+                    <div class="flex justify-between items-center mt-2">
+                        <div class="text-sm text-gray-600">
+                            <span>✏️ Edits: <span id="t4_intro_edits" class="font-semibold">0</span></span>
+                            <span class="mx-2">|</span>
+                            <span id="t4_intro_paste_warning" class="text-red-600 font-semibold hidden">⚠️ Paste: <span id="t4_intro_pastes">0</span></span>
+                        </div>
+                        <div id="t4_intro_count" class="text-lg font-semibold text-gray-700">Words: 0 / 50-70</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TOPIC 5 -->
+        <div class="bg-white rounded-2xl shadow-2xl p-8 mb-6 fade-in">
+            <div class="bg-gradient-to-r from-pink-600 to-pink-500 text-white px-6 py-4 rounded-t-xl -mx-8 -mt-8 mb-6">
+                <h2 class="text-2xl font-bold">📝 TOPIC 5: PRACTICAL LIFE SKILLS IN SCHOOLS</h2>
+                <p class="text-sm opacity-90">Schools should teach practical life skills rather than just academic subjects</p>
+            </div>
+
+            <!-- Full prompt -->
+            <div class="bg-pink-50 border-l-4 border-pink-600 p-5 mb-6 rounded-r-lg">
+                <div class="flex justify-between items-start">
+                    <div class="flex-1">
+                        <h3 class="font-bold text-pink-800 mb-3 text-lg">📋 Essay Topic:</h3>
+                        <p class="text-pink-900 mb-3 text-lg font-semibold">"Schools should teach practical life skills rather than just academic subjects. Do you agree?"</p>
+                        <p class="text-pink-700 text-sm"><em>Points to consider: financial management / communication skills / your own idea</em></p>
+                    </div>
+                    <button onclick="togglePrompt('topic5')" class="ml-4 text-pink-600 hover:text-pink-800 font-semibold text-sm whitespace-nowrap">
+                        [Show more ▼]
+                    </button>
+                </div>
+                
+                <div id="topic5Prompt" class="topic-prompt mt-4 pt-4 border-t border-pink-200">
+                    <p class="text-pink-800 text-sm leading-relaxed">
+                        There is growing debate about whether schools should place more emphasis on teaching practical life skills alongside traditional academic subjects. Supporters argue that skills like financial literacy, effective communication, and problem-solving are essential for success in adult life, while others believe academic knowledge remains the foundation of education.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Essay Analysis -->
+            <div class="bg-gray-50 rounded-xl p-6 mb-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4 border-b-2 border-green-500 pb-2">PART 1: ESSAY ANALYSIS</h3>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">1. SS (Specific Subject): *</label>
+                        <input type="text" id="t5_ss" 
+                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg"
+                            placeholder="Are there any specific subjects?"
+                            data-field="t5_ss">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">2. IS (Independent Subject): *</label>
+                        <input type="text" id="t5_is" 
+                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg"
+                            placeholder="Are there any independent subjects?"
+                            data-field="t5_is">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">3. Q (Question): *</label>
+                        <input type="text" id="t5_q" 
+                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg"
+                            placeholder="What are the questions?"
+                            data-field="t5_q">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">4. T (Task): *</label>
+                        <input type="text" id="t5_t" 
+                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg"
+                            placeholder="How many tasks must we address?"
+                            data-field="t5_t">
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">Body 1: *</label>
+                            <input type="text" id="t5_body1" 
+                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg"
+                                placeholder="Idea 1"
+                                data-field="t5_body1">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">Body 2: *</label>
+                            <input type="text" id="t5_body2" 
+                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg"
+                                placeholder="Idea 2"
+                                data-field="t5_body2">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">Body 3: *</label>
+                            <input type="text" id="t5_body3" 
+                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg"
+                                placeholder="Your own idea"
+                                data-field="t5_body3">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Write Introduction -->
+            <div class="bg-gray-50 rounded-xl p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4 border-b-2 border-green-500 pb-2">PART 2: WRITE INTRODUCTION</h3>
+                
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Introduction Paragraph: *</label>
+                    <textarea id="t5_intro" rows="8"
+                        class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg resize-vertical"
+                        placeholder="Write your introduction here... (50-70 words recommended)"
+                        data-field="t5_intro"></textarea>
+                    <div class="flex justify-between items-center mt-2">
+                        <div class="text-sm text-gray-600">
+                            <span>✏️ Edits: <span id="t5_intro_edits" class="font-semibold">0</span></span>
+                            <span class="mx-2">|</span>
+                            <span id="t5_intro_paste_warning" class="text-red-600 font-semibold hidden">⚠️ Paste: <span id="t5_intro_pastes">0</span></span>
+                        </div>
+                        <div id="t5_intro_count" class="text-lg font-semibold text-gray-700">Words: 0 / 50-70</div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <!-- Submit Button -->
         <div class="bg-white rounded-2xl shadow-2xl p-8">
             <div id="warningBox" class="hidden mb-4 p-4 bg-yellow-50 border-2 border-yellow-300 rounded-lg">
@@ -454,6 +792,7 @@ let elapsedSeconds = 0;
 
 // Behavior tracking
 let behaviorData = {
+    // Topic 1
     t1_ss: { edits: 0, pastes: 0, time: 0 },
     t1_is: { edits: 0, pastes: 0, time: 0 },
     t1_q: { edits: 0, pastes: 0, time: 0 },
@@ -462,6 +801,7 @@ let behaviorData = {
     t1_body2: { edits: 0, pastes: 0, time: 0 },
     t1_body3: { edits: 0, pastes: 0, time: 0 },
     t1_intro: { edits: 0, pastes: 0, time: 0 },
+    // Topic 2
     t2_ss: { edits: 0, pastes: 0, time: 0 },
     t2_is: { edits: 0, pastes: 0, time: 0 },
     t2_q: { edits: 0, pastes: 0, time: 0 },
@@ -469,9 +809,35 @@ let behaviorData = {
     t2_body1: { edits: 0, pastes: 0, time: 0 },
     t2_body2: { edits: 0, pastes: 0, time: 0 },
     t2_body3: { edits: 0, pastes: 0, time: 0 },
-    t2_intro: { edits: 0, pastes: 0, time: 0 }
+    t2_intro: { edits: 0, pastes: 0, time: 0 },
+    // Topic 3
+    t3_ss: { edits: 0, pastes: 0, time: 0 },
+    t3_is: { edits: 0, pastes: 0, time: 0 },
+    t3_q: { edits: 0, pastes: 0, time: 0 },
+    t3_t: { edits: 0, pastes: 0, time: 0 },
+    t3_body1: { edits: 0, pastes: 0, time: 0 },
+    t3_body2: { edits: 0, pastes: 0, time: 0 },
+    t3_body3: { edits: 0, pastes: 0, time: 0 },
+    t3_intro: { edits: 0, pastes: 0, time: 0 },
+    // Topic 4
+    t4_ss: { edits: 0, pastes: 0, time: 0 },
+    t4_is: { edits: 0, pastes: 0, time: 0 },
+    t4_q: { edits: 0, pastes: 0, time: 0 },
+    t4_t: { edits: 0, pastes: 0, time: 0 },
+    t4_body1: { edits: 0, pastes: 0, time: 0 },
+    t4_body2: { edits: 0, pastes: 0, time: 0 },
+    t4_body3: { edits: 0, pastes: 0, time: 0 },
+    t4_intro: { edits: 0, pastes: 0, time: 0 },
+    // Topic 5
+    t5_ss: { edits: 0, pastes: 0, time: 0 },
+    t5_is: { edits: 0, pastes: 0, time: 0 },
+    t5_q: { edits: 0, pastes: 0, time: 0 },
+    t5_t: { edits: 0, pastes: 0, time: 0 },
+    t5_body1: { edits: 0, pastes: 0, time: 0 },
+    t5_body2: { edits: 0, pastes: 0, time: 0 },
+    t5_body3: { edits: 0, pastes: 0, time: 0 },
+    t5_intro: { edits: 0, pastes: 0, time: 0 }
 };
-
 let fieldTimers = {};
 
 // ========== TOGGLE PROMPT ==========
@@ -649,7 +1015,10 @@ function updateProgress() {
     let filledCount = 0;
     const requiredFields = [
         't1_ss', 't1_is', 't1_q', 't1_t', 't1_body1', 't1_body2', 't1_intro',
-        't2_ss', 't2_is', 't2_q', 't2_t', 't2_body1', 't2_body2', 't2_intro'
+        't2_ss', 't2_is', 't2_q', 't2_t', 't2_body1', 't2_body2', 't2_intro',
+        't3_ss', 't3_is', 't3_q', 't3_t', 't3_body1', 't3_body2', 't3_intro',
+        't4_ss', 't4_is', 't4_q', 't4_t', 't4_body1', 't4_body2', 't4_intro',
+        't5_ss', 't5_is', 't5_q', 't5_t', 't5_body1', 't5_body2', 't5_intro'
     ];
     
     requiredFields.forEach(fieldId => {
@@ -660,7 +1029,7 @@ function updateProgress() {
     });
     
     // Count optional fields separately
-    const optionalFields = ['t1_body3', 't2_body3'];
+    const optionalFields = ['t1_body3', 't2_body3', 't3_body3', 't4_body3', 't5_body3'];
     optionalFields.forEach(fieldId => {
         const field = document.getElementById(fieldId);
         if (field && field.value.trim().length > 0) {
@@ -683,13 +1052,15 @@ function updateProgress() {
         document.getElementById('warningBox').classList.add('hidden');
     }
 }
-
 // ========== SUBMIT TEST ==========
 async function submitTest() {
     // Check completion
     const requiredFields = [
         't1_ss', 't1_is', 't1_q', 't1_t', 't1_body1', 't1_body2', 't1_intro',
-        't2_ss', 't2_is', 't2_q', 't2_t', 't2_body1', 't2_body2', 't2_intro'
+        't2_ss', 't2_is', 't2_q', 't2_t', 't2_body1', 't2_body2', 't2_intro',
+        't3_ss', 't3_is', 't3_q', 't3_t', 't3_body1', 't3_body2', 't3_intro',
+        't4_ss', 't4_is', 't4_q', 't4_t', 't4_body1', 't4_body2', 't4_intro',
+        't5_ss', 't5_is', 't5_q', 't5_t', 't5_body1', 't5_body2', 't5_intro'
     ];
     
     let missingCount = 0;
@@ -701,14 +1072,14 @@ async function submitTest() {
     });
     
     if (missingCount > 0) {
-        if (!confirm(`Bạn còn ${missingCount} mục bắt buộc chưa điền. Nộp bài?`)) return;
+        if (!confirm(`You still have ${missingCount} required fields empty. Submit anyway?`)) return;
     }
     
     stopTimer();
     
     const submitBtn = document.getElementById('submitBtn');
     submitBtn.disabled = true;
-    submitBtn.innerHTML = '<div class="spinner"></div> <span>Đang xử lý...</span>';
+    submitBtn.innerHTML = '<div class="spinner"></div> <span>Processing...</span>';
     
     // Collect all data
     const answers = {};
@@ -721,10 +1092,13 @@ async function submitTest() {
         }
     });
     
-    // Calculate statistics
+    // Calculate word counts
     const t1IntroWords = answers.t1_intro ? answers.t1_intro.split(/\s+/).filter(w => w.length > 0).length : 0;
     const t2IntroWords = answers.t2_intro ? answers.t2_intro.split(/\s+/).filter(w => w.length > 0).length : 0;
-    const totalWords = t1IntroWords + t2IntroWords;
+    const t3IntroWords = answers.t3_intro ? answers.t3_intro.split(/\s+/).filter(w => w.length > 0).length : 0;
+    const t4IntroWords = answers.t4_intro ? answers.t4_intro.split(/\s+/).filter(w => w.length > 0).length : 0;
+    const t5IntroWords = answers.t5_intro ? answers.t5_intro.split(/\s+/).filter(w => w.length > 0).length : 0;
+    const totalWords = t1IntroWords + t2IntroWords + t3IntroWords + t4IntroWords + t5IntroWords;
     
     const totalPastes = Object.values(behaviorData).reduce((sum, data) => sum + data.pastes, 0);
     const totalEdits = Object.values(behaviorData).reduce((sum, data) => sum + data.edits, 0);
@@ -737,12 +1111,26 @@ async function submitTest() {
     
     const timeUsedMinutes = Math.floor(elapsedSeconds / 60);
     const timeUsedSeconds = elapsedSeconds % 60;
-    const timeUsedDisplay = `${timeUsedMinutes}p ${timeUsedSeconds}s`;
+    const timeUsedDisplay = `${timeUsedMinutes}m ${timeUsedSeconds}s`;
     
     const completionPercent = Math.round((requiredFields.filter(f => {
         const field = document.getElementById(f);
         return field && field.value.trim().length > 0;
     }).length / requiredFields.length) * 100);
+    
+    // Helper function to calculate time for a topic
+    function calcTopicTime(prefix) {
+        return Math.round((
+            behaviorData[`${prefix}_ss`].time +
+            behaviorData[`${prefix}_is`].time +
+            behaviorData[`${prefix}_q`].time +
+            behaviorData[`${prefix}_t`].time +
+            behaviorData[`${prefix}_body1`].time +
+            behaviorData[`${prefix}_body2`].time +
+            behaviorData[`${prefix}_body3`].time +
+            behaviorData[`${prefix}_intro`].time
+        ) / 1000);
+    }
     
     // Data to send
     const dataToSend = {
@@ -763,16 +1151,7 @@ async function submitTest() {
             body3: answers.t1_body3 || '',
             introduction: answers.t1_intro || '',
             wordCount: t1IntroWords,
-            timeSeconds: Math.round((
-                behaviorData.t1_ss.time +
-                behaviorData.t1_is.time +
-                behaviorData.t1_q.time +
-                behaviorData.t1_t.time +
-                behaviorData.t1_body1.time +
-                behaviorData.t1_body2.time +
-                behaviorData.t1_body3.time +
-                behaviorData.t1_intro.time
-            ) / 1000),
+            timeSeconds: calcTopicTime('t1'),
             keystrokeLog: {}
         },
 
@@ -787,20 +1166,56 @@ async function submitTest() {
             body3: answers.t2_body3 || '',
             introduction: answers.t2_intro || '',
             wordCount: t2IntroWords,
-            timeSeconds: Math.round((
-                behaviorData.t2_ss.time +
-                behaviorData.t2_is.time +
-                behaviorData.t2_q.time +
-                behaviorData.t2_t.time +
-                behaviorData.t2_body1.time +
-                behaviorData.t2_body2.time +
-                behaviorData.t2_body3.time +
-                behaviorData.t2_intro.time
-            ) / 1000),
+            timeSeconds: calcTopicTime('t2'),
             keystrokeLog: {}
         },
 
-        // === THỐNG KÊ & HÀNH VI ===
+        // === TOPIC 3 ===
+        topic3: {
+            ss: answers.t3_ss || '',
+            is: answers.t3_is || '',
+            q: answers.t3_q || '',
+            t: answers.t3_t || '',
+            body1: answers.t3_body1 || '',
+            body2: answers.t3_body2 || '',
+            body3: answers.t3_body3 || '',
+            introduction: answers.t3_intro || '',
+            wordCount: t3IntroWords,
+            timeSeconds: calcTopicTime('t3'),
+            keystrokeLog: {}
+        },
+
+        // === TOPIC 4 ===
+        topic4: {
+            ss: answers.t4_ss || '',
+            is: answers.t4_is || '',
+            q: answers.t4_q || '',
+            t: answers.t4_t || '',
+            body1: answers.t4_body1 || '',
+            body2: answers.t4_body2 || '',
+            body3: answers.t4_body3 || '',
+            introduction: answers.t4_intro || '',
+            wordCount: t4IntroWords,
+            timeSeconds: calcTopicTime('t4'),
+            keystrokeLog: {}
+        },
+
+        // === TOPIC 5 ===
+        topic5: {
+            ss: answers.t5_ss || '',
+            is: answers.t5_is || '',
+            q: answers.t5_q || '',
+            t: answers.t5_t || '',
+            body1: answers.t5_body1 || '',
+            body2: answers.t5_body2 || '',
+            body3: answers.t5_body3 || '',
+            introduction: answers.t5_intro || '',
+            wordCount: t5IntroWords,
+            timeSeconds: calcTopicTime('t5'),
+            keystrokeLog: {}
+        },
+
+        // === STATISTICS & BEHAVIOR ===
         totalPastes: totalPastes,
         totalEdits: totalEdits,
         behaviorData: behaviorData,
@@ -811,7 +1226,13 @@ async function submitTest() {
             t1_intro_edits: behaviorData.t1_intro.edits,
             t1_intro_pastes: behaviorData.t1_intro.pastes,
             t2_intro_edits: behaviorData.t2_intro.edits,
-            t2_intro_pastes: behaviorData.t2_intro.pastes
+            t2_intro_pastes: behaviorData.t2_intro.pastes,
+            t3_intro_edits: behaviorData.t3_intro.edits,
+            t3_intro_pastes: behaviorData.t3_intro.pastes,
+            t4_intro_edits: behaviorData.t4_intro.edits,
+            t4_intro_pastes: behaviorData.t4_intro.pastes,
+            t5_intro_edits: behaviorData.t5_intro.edits,
+            t5_intro_pastes: behaviorData.t5_intro.pastes
         }
     };
     
@@ -825,15 +1246,14 @@ async function submitTest() {
             body: JSON.stringify(dataToSend)
         });
         
-        console.log('Dữ liệu đã gửi:', dataToSend);
+        console.log('Data sent:', dataToSend);
         showResults(completionPercent, timeUsedDisplay, totalWords, totalPastes, totalEdits);
         
     } catch (error) {
-        console.error('Lỗi gửi dữ liệu:', error);
+        console.error('Error sending data:', error);
         showResults(completionPercent, timeUsedDisplay, totalWords, totalPastes, totalEdits);
     }
 }
-
 // ========== SHOW RESULTS ==========
 function showResults(completionPercent, timeUsed, totalWords, totalPastes, totalEdits) {
     document.getElementById('testScreen').classList.add('hidden');
@@ -842,52 +1262,44 @@ function showResults(completionPercent, timeUsed, totalWords, totalPastes, total
     document.getElementById('resultCompletion').textContent = completionPercent + '%';
     document.getElementById('resultTime').textContent = timeUsed;
     document.getElementById('resultWords').textContent = totalWords;
-    document.getElementById('resultPaste').textContent = totalPastes + ' lần';
+    document.getElementById('resultPaste').textContent = totalPastes;
     
     // Behavior stats
     let behaviorHtml = '';
     
     behaviorHtml += `<div class="flex items-center gap-2">
         <span class="text-2xl">✏️</span>
-        <span>Tổng số lần chỉnh sửa: <strong>${totalEdits}</strong></span>
+        <span>Total edits: <strong>${totalEdits}</strong></span>
     </div>`;
     
     behaviorHtml += `<div class="flex items-center gap-2">
         <span class="text-2xl">📋</span>
-        <span>Tổng số lần paste: <strong>${totalPastes}</strong> ${totalPastes > 5 ? '⚠️ (Nhiều)' : totalPastes > 0 ? '(Bình thường)' : '✅ (Tốt)'}</span>
+        <span>Total pastes: <strong>${totalPastes}</strong> ${totalPastes > 5 ? '⚠️ (Many)' : totalPastes > 0 ? '(Normal)' : '✅ (Good)'}</span>
     </div>`;
     
-    // Topic 1 intro stats
-    const t1Words = document.getElementById('t1_intro').value.trim().split(/\s+/).filter(w => w.length > 0).length;
-    behaviorHtml += `<div class="flex items-center gap-2">
-        <span class="text-2xl">📝</span>
-        <span>Đề 1 - Mở bài: <strong>${t1Words} words</strong> | 
-        ${behaviorData.t1_intro.edits} edits | 
-        ${behaviorData.t1_intro.pastes} pastes</span>
-    </div>`;
-    
-    // Topic 2 intro stats
-    const t2Words = document.getElementById('t2_intro').value.trim().split(/\s+/).filter(w => w.length > 0).length;
-    behaviorHtml += `<div class="flex items-center gap-2">
-        <span class="text-2xl">📝</span>
-        <span>Đề 2 - Mở bài: <strong>${t2Words} words</strong> | 
-        ${behaviorData.t2_intro.edits} edits | 
-        ${behaviorData.t2_intro.pastes} pastes</span>
-    </div>`;
-    
-    // Time breakdown
-    const t1Time = Math.round((behaviorData.t1_intro.time + behaviorData.t1_ss.time + behaviorData.t1_is.time + behaviorData.t1_q.time + behaviorData.t1_t.time + behaviorData.t1_body1.time + behaviorData.t1_body2.time + behaviorData.t1_body3.time) / 1000);
-    const t2Time = Math.round((behaviorData.t2_intro.time + behaviorData.t2_ss.time + behaviorData.t2_is.time + behaviorData.t2_q.time + behaviorData.t2_t.time + behaviorData.t2_body1.time + behaviorData.t2_body2.time + behaviorData.t2_body3.time) / 1000);
-    
-    behaviorHtml += `<div class="flex items-center gap-2">
-        <span class="text-2xl">⏱️</span>
-        <span>Thời gian làm Đề 1: <strong>${Math.floor(t1Time / 60)}p ${t1Time % 60}s</strong></span>
-    </div>`;
-    
-    behaviorHtml += `<div class="flex items-center gap-2">
-        <span class="text-2xl">⏱️</span>
-        <span>Thời gian làm Đề 2: <strong>${Math.floor(t2Time / 60)}p ${t2Time % 60}s</strong></span>
-    </div>`;
+    // Per-topic stats
+    for (let i = 1; i <= 5; i++) {
+        const prefix = `t${i}`;
+        const words = document.getElementById(`${prefix}_intro`).value.trim().split(/\s+/).filter(w => w.length > 0).length;
+        const time = Math.round((
+            behaviorData[`${prefix}_ss`].time +
+            behaviorData[`${prefix}_is`].time +
+            behaviorData[`${prefix}_q`].time +
+            behaviorData[`${prefix}_t`].time +
+            behaviorData[`${prefix}_body1`].time +
+            behaviorData[`${prefix}_body2`].time +
+            behaviorData[`${prefix}_body3`].time +
+            behaviorData[`${prefix}_intro`].time
+        ) / 1000);
+        
+        behaviorHtml += `<div class="flex items-center gap-2">
+            <span class="text-2xl">📝</span>
+            <span>Topic ${i}: <strong>${words} words</strong> | 
+            ${behaviorData[`${prefix}_intro`].edits} edits | 
+            ${behaviorData[`${prefix}_intro`].pastes} pastes | 
+            ${Math.floor(time / 60)}m ${time % 60}s</span>
+        </div>`;
+    }
     
     document.getElementById('behaviorStats').innerHTML = behaviorHtml;
 }
