@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ ss: answers.t1_ss || '',<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -1152,7 +1152,10 @@ async function submitTest() {
             introduction: answers.t1_intro || '',
             wordCount: t1IntroWords,
             timeSeconds: calcTopicTime('t1'),
-            keystrokeLog: {}
+            keystrokeLog: {
+        pastes: behaviorData.t1_intro.pastes,
+        edits: behaviorData.t1_intro.edits
+    }
         },
 
         // === TOPIC 2 ===
@@ -1167,7 +1170,10 @@ async function submitTest() {
             introduction: answers.t2_intro || '',
             wordCount: t2IntroWords,
             timeSeconds: calcTopicTime('t2'),
-            keystrokeLog: {}
+            keystrokeLog: {
+        pastes: behaviorData.t2_intro.pastes,
+        edits: behaviorData.t2_intro.edits
+    }
         },
 
         // === TOPIC 3 ===
@@ -1182,7 +1188,10 @@ async function submitTest() {
             introduction: answers.t3_intro || '',
             wordCount: t3IntroWords,
             timeSeconds: calcTopicTime('t3'),
-            keystrokeLog: {}
+            keystrokeLog: {
+        pastes: behaviorData.t3_intro.pastes,
+        edits: behaviorData.t3_intro.edits
+    }
         },
 
         // === TOPIC 4 ===
@@ -1197,7 +1206,10 @@ async function submitTest() {
             introduction: answers.t4_intro || '',
             wordCount: t4IntroWords,
             timeSeconds: calcTopicTime('t4'),
-            keystrokeLog: {}
+            keystrokeLog: {
+        pastes: behaviorData.t4_intro.pastes,
+        edits: behaviorData.t4_intro.edits
+    }
         },
 
         // === TOPIC 5 ===
@@ -1212,7 +1224,10 @@ async function submitTest() {
             introduction: answers.t5_intro || '',
             wordCount: t5IntroWords,
             timeSeconds: calcTopicTime('t5'),
-            keystrokeLog: {}
+            keystrokeLog: {
+        pastes: behaviorData.t5_intro.pastes,
+        edits: behaviorData.t5_intro.edits
+    }
         },
 
         // === STATISTICS & BEHAVIOR ===
