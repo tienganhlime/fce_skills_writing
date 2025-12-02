@@ -15,7 +15,12 @@
     .tab { @apply px-4 py-2 rounded-t-lg font-semibold transition; }
     .tab-active { @apply bg-white text-green-700 border-t-2 border-green-600; }
     .tab-inactive { @apply bg-gray-200 text-gray-600 hover:bg-gray-300; }
-    .editable { @apply p-3 border rounded-lg bg-yellow-50 border-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-500; }
+    .editable {
+  @apply p-3 border rounded-lg bg-yellow-50 border-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-500;
+  min-height: 60px;
+  overflow: hidden;
+  resize: vertical; /* Cho phép kéo thủ công nếu cần */
+}
   </style>
 </head>
 <body class="min-h-screen p-4">
@@ -243,221 +248,192 @@
 
     currentFeedback = data;
 
-    // === ĐỀ 1 ===
-    const t1 = work.topic1;
-    const fb1 = data.teacherFeedback?.topic1 || data.aiFeedback?.topic1 || {};
-    const analysisFb = fb1.analysis_feedback || {};
-    const introFb = fb1.introduction_feedback || {};
-    const grammarErrors = introFb.grammar_errors || [];
-    const suggestions = fb1.improvement_suggestions || [];
+// === ĐỀ 1 ===
+const t1 = work.topic1;
+const fb1 = data.teacherFeedback?.topic1 || data.aiFeedback?.topic1 || {};
+const analysisFb = fb1.analysis_feedback || {};
+const introFb = fb1.introduction_feedback || {};
+const grammarErrors = introFb.grammar_errors || [];
+const suggestions = fb1.improvement_suggestions || [];
 
-    document.getElementById('tab-topic1').innerHTML = `
-      <div class="bg-gradient-to-r from-blue-50 to-blue-100 p-5 rounded-xl">
-        <h4 class="font-bold text-blue-800 mb-3">ĐỀ 1: ${t1.title || 'APPEARANCE & SOCIETY'}</h4>
-        <p class="text-sm italic mb-4">"${t1.prompt || '...'}"</p>
+document.getElementById('tab-topic1').innerHTML = `
+  <div class="bg-gradient-to-r from-blue-50 to-blue-100 p-5 rounded-xl">
+    <h4 class="font-bold text-blue-800 mb-3">ĐỀ 1: ${t1.title || 'APPEARANCE & SOCIETY'}</h4>
+    <p class="text-sm italic mb-4">"${t1.prompt || '...'}"</p>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <!-- Phân tích -->
-          <div class="bg-white p-4 rounded-lg shadow">
-            <h5 class="font-bold text-green-700 mb-2">PHÂN TÍCH ĐỀ</h5>
-            <div class="space-y-1 text-sm">
-              <div><strong>SS:</strong> ${t1.ss || '—'}</div>
-              <div><strong>IS:</strong> ${t1.is || '—'}</div>
-              <div><strong>Q:</strong> ${t1.q || '—'}</div>
-              <div><strong>T:</strong> ${t1.t || '—'}</div>
-            </div>
-            <p class="mt-2"><strong>Outline:</strong> ${[t1.body1, t1.body2, t1.body3].filter(x=>x).join(' → ') || '—'}</p>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Phân tích -->
+      <div class="bg-white p-4 rounded-lg shadow">
+        <h5 class="font-bold text-green-700 mb-2">PHÂN TÍCH ĐỀ</h5>
+        <div class="space-y-1 text-sm">
+          <div><strong>SS:</strong> ${t1.ss || '—'}</div>
+          <div><strong>IS:</strong> ${t1.is || '—'}</div>
+          <div><strong>Q:</strong> ${t1.q || '—'}</div>
+          <div><strong>T:</strong> ${t1.t || '—'}</div>
+        </div>
+        <p class="mt-2"><strong>Outline:</strong> ${[t1.body1, t1.body2, t1.body3].filter(x=>x).join(' → ') || '—'}</p>
+      </div>
+
+      <!-- Mở bài -->
+      <div class="bg-white p-4 rounded-lg shadow">
+        <h5 class="font-bold text-purple-700 mb-2">MỞ BÀI</h5>
+        <p class="text-sm bg-gray-50 p-3 rounded">${t1.introduction || '—'}</p>
+        <p class="mt-2 text-xs text-gray-600">Số từ: ${t1.wordCount || 0} | Thời gian: ${t1.timeUsed || '0p 0s'}</p>
+      </div>
+    </div>
+
+    <!-- Feedback Chi Tiết -->
+    <div class="mt-6 bg-yellow-50 p-4 rounded-lg">
+      <h5 class="font-bold text-yellow-800 mb-2">NHẬN XÉT & ĐÁNH GIÁ</h5>
+      
+      <div class="space-y-4">
+        <!-- Analysis Feedback -->
+        <div>
+          <h6 class="font-semibold text-gray-700">Phân tích đề (Score: <span class="text-blue-600">${fb1.analysis_score || 0}/10</span>)</h6>
+          <textarea id="t1-analysis-full" class="editable w-full mt-2" rows="6">SS: ${analysisFb.ss_correct ? '✅' : '❌'} - ${analysisFb.ss_comment || ''}
+IS: ${analysisFb.is_correct ? '✅' : '❌'} - ${analysisFb.is_comment || ''}
+Q: ${analysisFb.q_correct ? '✅' : '❌'} - ${analysisFb.q_comment || ''}
+T: ${analysisFb.t_correct ? '✅' : '❌'} - ${analysisFb.t_comment || ''}
+Outline Score: ${analysisFb.outline_score || 0}/2 - ${analysisFb.outline_comment || ''}
+
+Overall: ${fb1.overall_comment || ''}</textarea>
+        </div>
+
+        <!-- Introduction Feedback -->
+        <div>
+          <h6 class="font-semibold text-gray-700">Mở bài (Score: <span class="text-blue-600">${fb1.introduction_score || 0}/10</span>) | CEFR: <span class="text-purple-600">${fb1.cefr_level || 'N/A'}</span></h6>
+          
+          <div>
+            <strong>Strengths & Weaknesses:</strong>
+            <textarea id="t1-strengths-weaknesses" class="editable w-full mt-2" rows="8">STRENGTHS:
+${introFb.strengths?.map(s => `• ${s}`).join('\n') || '• None'}
+
+WEAKNESSES:
+${introFb.weaknesses?.map(w => `• ${w}`).join('\n') || '• None'}</textarea>
           </div>
 
-          <!-- Mở bài -->
-          <div class="bg-white p-4 rounded-lg shadow">
-            <h5 class="font-bold text-purple-700 mb-2">MỞ BÀI</h5>
-            <p class="text-sm bg-gray-50 p-3 rounded">${t1.introduction || '—'}</p>
-            <p class="mt-2 text-xs text-gray-600">Số từ: ${t1.wordCount || 0} | Thời gian: ${t1.timeUsed || '0p 0s'}</p>
+          <div class="mt-3">
+            <strong>Grammar Errors:</strong>
+            <textarea id="t1-grammar" class="editable w-full mt-2" rows="5">${grammarErrors.map(e => `• Error: "${e.error}" → Correction: "${e.correction}"`).join('\n') || '• None'}</textarea>
+          </div>
+
+          <div class="mt-3">
+            <strong>Structure Breakdown (Scores):</strong>
+            <textarea id="t1-structure" class="editable w-full mt-2" rows="4">Background: ${introFb.structure_breakdown?.background || 0}/1
+Paraphrase: ${introFb.structure_breakdown?.paraphrase || 0}/1.5
+Thesis: ${introFb.structure_breakdown?.thesis || 0}/2
+General: ${introFb.structure_breakdown?.general || 0}/0.5</textarea>
+          </div>
+
+          <div class="mt-3">
+            <strong>Word Count Score:</strong>
+            <textarea id="t1-wordcount" class="editable w-full mt-2" rows="1">${introFb.word_count_score || 0}/1 (${introFb.word_count || 0} words)</textarea>
           </div>
         </div>
 
-        <!-- Feedback Chi Tiết (AI/Teacher) -->
-        <div class="mt-6 bg-yellow-50 p-4 rounded-lg">
-          <h5 class="font-bold text-yellow-800 mb-2">FEEDBACK CHI TIẾT (AI - Giáo viên sửa)</h5>
-          
-          <div class="space-y-4">
-            <!-- Analysis Feedback -->
-            <div>
-              <h6 class="font-semibold text-gray-700">Phân tích đề (Score: <span class="text-blue-600">${fb1.analysis_score || 0}/10</span>)</h6>
-              <ul class="list-disc pl-5 text-sm space-y-1">
-                <li>SS: ${analysisFb.ss_correct ? '✅' : '❌'} - ${analysisFb.ss_comment || ''}</li>
-                <li>IS: ${analysisFb.is_correct ? '✅' : '❌'} - ${analysisFb.is_comment || ''}</li>
-                <li>Q: ${analysisFb.q_correct ? '✅' : '❌'} - ${analysisFb.q_comment || ''}</li>
-                <li>T: ${analysisFb.t_correct ? '✅' : '❌'} - ${analysisFb.t_comment || ''}</li>
-                <li>Outline Score: ${analysisFb.outline_score || 0}/2 - ${analysisFb.outline_comment || ''}</li>
-              </ul>
-              <textarea id="t1-analysis-comment" class="editable w-full mt-2" rows="3">${fb1.overall_comment || ''}</textarea>
-            </div>
-
-            <!-- Introduction Feedback -->
-            <div>
-              <h6 class="font-semibold text-gray-700">Mở bài (Score: <span class="text-blue-600">${fb1.introduction_score || 0}/10</span>) | CEFR: <span class="text-purple-600">${fb1.cefr_level || 'N/A'}</span></h6>
-              <div class="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <strong>Strengths:</strong>
-                  <ul class="list-disc pl-5 space-y-1">
-                    ${introFb.strengths?.map(s => `<li>${s}</li>`).join('') || '<li>None</li>'}
-                  </ul>
-                  <textarea id="t1-strengths" class="editable w-full mt-2" rows="3">${introFb.strengths?.join('\n') || ''}</textarea>
-                </div>
-                <div>
-                  <strong>Weaknesses:</strong>
-                  <ul class="list-disc pl-5 space-y-1">
-                    ${introFb.weaknesses?.map(w => `<li>${w}</li>`).join('') || '<li>None</li>'}
-                  </ul>
-                  <textarea id="t1-weaknesses" class="editable w-full mt-2" rows="3">${introFb.weaknesses?.join('\n') || ''}</textarea>
-                </div>
-              </div>
-
-              <div class="mt-3">
-                <strong>Grammar Errors:</strong>
-                <ul class="list-disc pl-5 space-y-1 text-sm">
-                  ${grammarErrors.map(e => `<li>Error: "${e.error}" → Correction: "${e.correction}"</li>`).join('') || '<li>None</li>'}
-                </ul>
-                <textarea id="t1-grammar" class="editable w-full mt-2" rows="3">${grammarErrors.map(e => `${e.error} → ${e.correction}`).join('\n') || ''}</textarea>
-              </div>
-
-              <div class="mt-3">
-                <strong>Structure Breakdown (Scores):</strong>
-                <ul class="list-disc pl-5 space-y-1 text-sm">
-                  <li>Background: ${introFb.structure_breakdown?.background || 0}/1</li>
-                  <li>Paraphrase: ${introFb.structure_breakdown?.paraphrase || 0}/1.5</li>
-                  <li>Thesis: ${introFb.structure_breakdown?.thesis || 0}/2</li>
-                  <li>General: ${introFb.structure_breakdown?.general || 0}/0.5</li>
-                </ul>
-              </div>
-
-              <div class="mt-3">
-                <strong>Word Count Score:</strong> ${introFb.word_count_score || 0}/1 (${introFb.word_count || 0} words)
-              </div>
-            </div>
-
-            <!-- Suggestions -->
-            <div>
-              <h6 class="font-semibold text-gray-700">Improvement Suggestions:</h6>
-              <ul class="list-disc pl-5 space-y-1 text-sm">
-                ${suggestions.map(s => `<li>${s}</li>`).join('') || '<li>None</li>'}
-              </ul>
-              <textarea id="t1-suggestions" class="editable w-full mt-2" rows="4">${suggestions.join('\n') || ''}</textarea>
-            </div>
-          </div>
+        <!-- Suggestions -->
+        <div>
+          <h6 class="font-semibold text-gray-700">Improvement Suggestions:</h6>
+          <textarea id="t1-suggestions" class="editable w-full mt-2" rows="6">${suggestions.map(s => `• ${s}`).join('\n') || '• None'}</textarea>
         </div>
       </div>
-    `;
+    </div>
+  </div>
+`;
 
-    // === ĐỀ 2 ===
-    const t2 = work.topic2;
-    const fb2 = data.teacherFeedback?.topic2 || data.aiFeedback?.topic2 || {};
-    const analysisFb2 = fb2.analysis_feedback || {};
-    const introFb2 = fb2.introduction_feedback || {};
-    const grammarErrors2 = introFb2.grammar_errors || [];
-    const suggestions2 = fb2.improvement_suggestions || [];
+// === ĐỀ 2 ===
+const t2 = work.topic2;
+const fb2 = data.teacherFeedback?.topic2 || data.aiFeedback?.topic2 || {};
+const analysisFb2 = fb2.analysis_feedback || {};
+const introFb2 = fb2.introduction_feedback || {};
+const grammarErrors2 = introFb2.grammar_errors || [];
+const suggestions2 = fb2.improvement_suggestions || [];
 
-    document.getElementById('tab-topic2').innerHTML = `
-      <div class="bg-gradient-to-r from-blue-50 to-blue-100 p-5 rounded-xl">
-        <h4 class="font-bold text-blue-800 mb-3">ĐỀ 2: ${t2.title || 'SCHOOL DECISIONS'}</h4>
-        <p class="text-sm italic mb-4">"${t2.prompt || '...'}"</p>
+document.getElementById('tab-topic2').innerHTML = `
+  <div class="bg-gradient-to-r from-blue-50 to-blue-100 p-5 rounded-xl">
+    <h4 class="font-bold text-blue-800 mb-3">ĐỀ 2: ${t2.title || 'SCHOOL DECISIONS'}</h4>
+    <p class="text-sm italic mb-4">"${t2.prompt || '...'}"</p>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <!-- Phân tích -->
-          <div class="bg-white p-4 rounded-lg shadow">
-            <h5 class="font-bold text-green-700 mb-2">PHÂN TÍCH ĐỀ</h5>
-            <div class="space-y-1 text-sm">
-              <div><strong>SS:</strong> ${t2.ss || '—'}</div>
-              <div><strong>IS:</strong> ${t2.is || '—'}</div>
-              <div><strong>Q:</strong> ${t2.q || '—'}</div>
-              <div><strong>T:</strong> ${t2.t || '—'}</div>
-            </div>
-            <p class="mt-2"><strong>Outline:</strong> ${[t2.body1, t2.body2, t2.body3].filter(x=>x).join(' → ') || '—'}</p>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Phân tích -->
+      <div class="bg-white p-4 rounded-lg shadow">
+        <h5 class="font-bold text-green-700 mb-2">PHÂN TÍCH ĐỀ</h5>
+        <div class="space-y-1 text-sm">
+          <div><strong>SS:</strong> ${t2.ss || '—'}</div>
+          <div><strong>IS:</strong> ${t2.is || '—'}</div>
+          <div><strong>Q:</strong> ${t2.q || '—'}</div>
+          <div><strong>T:</strong> ${t2.t || '—'}</div>
+        </div>
+        <p class="mt-2"><strong>Outline:</strong> ${[t2.body1, t2.body2, t2.body3].filter(x=>x).join(' → ') || '—'}</p>
+      </div>
+
+      <!-- Mở bài -->
+      <div class="bg-white p-4 rounded-lg shadow">
+        <h5 class="font-bold text-purple-700 mb-2">MỞ BÀI</h5>
+        <p class="text-sm bg-gray-50 p-3 rounded">${t2.introduction || '—'}</p>
+        <p class="mt-2 text-xs text-gray-600">Số từ: ${t2.wordCount || 0} | Thời gian: ${t2.timeUsed || '0p 0s'}</p>
+      </div>
+    </div>
+
+    <!-- Feedback Chi Tiết -->
+    <div class="mt-6 bg-yellow-50 p-4 rounded-lg">
+      <h5 class="font-bold text-yellow-800 mb-2">NHẬN XÉT & ĐÁNH GIÁ</h5>
+      
+      <div class="space-y-4">
+        <!-- Analysis Feedback -->
+        <div>
+          <h6 class="font-semibold text-gray-700">Phân tích đề (Score: <span class="text-blue-600">${fb2.analysis_score || 0}/10</span>)</h6>
+          <textarea id="t2-analysis-full" class="editable w-full mt-2" rows="6">SS: ${analysisFb2.ss_correct ? '✅' : '❌'} - ${analysisFb2.ss_comment || ''}
+IS: ${analysisFb2.is_correct ? '✅' : '❌'} - ${analysisFb2.is_comment || ''}
+Q: ${analysisFb2.q_correct ? '✅' : '❌'} - ${analysisFb2.q_comment || ''}
+T: ${analysisFb2.t_correct ? '✅' : '❌'} - ${analysisFb2.t_comment || ''}
+Outline Score: ${analysisFb2.outline_score || 0}/2 - ${analysisFb2.outline_comment || ''}
+
+Overall: ${fb2.overall_comment || ''}</textarea>
+        </div>
+
+        <!-- Introduction Feedback -->
+        <div>
+          <h6 class="font-semibold text-gray-700">Mở bài (Score: <span class="text-blue-600">${fb2.introduction_score || 0}/10</span>) | CEFR: <span class="text-purple-600">${fb2.cefr_level || 'N/A'}</span></h6>
+          
+          <div>
+            <strong>Strengths & Weaknesses:</strong>
+            <textarea id="t2-strengths-weaknesses" class="editable w-full mt-2" rows="8">STRENGTHS:
+${introFb2.strengths?.map(s => `• ${s}`).join('\n') || '• None'}
+
+WEAKNESSES:
+${introFb2.weaknesses?.map(w => `• ${w}`).join('\n') || '• None'}</textarea>
           </div>
 
-          <!-- Mở bài -->
-          <div class="bg-white p-4 rounded-lg shadow">
-            <h5 class="font-bold text-purple-700 mb-2">MỞ BÀI</h5>
-            <p class="text-sm bg-gray-50 p-3 rounded">${t2.introduction || '—'}</p>
-            <p class="mt-2 text-xs text-gray-600">Số từ: ${t2.wordCount || 0} | Thời gian: ${t2.timeUsed || '0p 0s'}</p>
+          <div class="mt-3">
+            <strong>Grammar Errors:</strong>
+            <textarea id="t2-grammar" class="editable w-full mt-2" rows="5">${grammarErrors2.map(e => `• Error: "${e.error}" → Correction: "${e.correction}"`).join('\n') || '• None'}</textarea>
+          </div>
+
+          <div class="mt-3">
+            <strong>Structure Breakdown (Scores):</strong>
+            <textarea id="t2-structure" class="editable w-full mt-2" rows="4">Background: ${introFb2.structure_breakdown?.background || 0}/1
+Paraphrase: ${introFb2.structure_breakdown?.paraphrase || 0}/1.5
+Thesis: ${introFb2.structure_breakdown?.thesis || 0}/2
+General: ${introFb2.structure_breakdown?.general || 0}/0.5</textarea>
+          </div>
+
+          <div class="mt-3">
+            <strong>Word Count Score:</strong>
+            <textarea id="t2-wordcount" class="editable w-full mt-2" rows="1">${introFb2.word_count_score || 0}/1 (${introFb2.word_count || 0} words)</textarea>
           </div>
         </div>
 
-        <!-- Feedback Chi Tiết (AI/Teacher) -->
-        <div class="mt-6 bg-yellow-50 p-4 rounded-lg">
-          <h5 class="font-bold text-yellow-800 mb-2">FEEDBACK CHI TIẾT (AI - Giáo viên sửa)</h5>
-          
-          <div class="space-y-4">
-            <!-- Analysis Feedback -->
-            <div>
-              <h6 class="font-semibold text-gray-700">Phân tích đề (Score: <span class="text-blue-600">${fb2.analysis_score || 0}/10</span>)</h6>
-              <ul class="list-disc pl-5 text-sm space-y-1">
-                <li>SS: ${analysisFb2.ss_correct ? '✅' : '❌'} - ${analysisFb2.ss_comment || ''}</li>
-                <li>IS: ${analysisFb2.is_correct ? '✅' : '❌'} - ${analysisFb2.is_comment || ''}</li>
-                <li>Q: ${analysisFb2.q_correct ? '✅' : '❌'} - ${analysisFb2.q_comment || ''}</li>
-                <li>T: ${analysisFb2.t_correct ? '✅' : '❌'} - ${analysisFb2.t_comment || ''}</li>
-                <li>Outline Score: ${analysisFb2.outline_score || 0}/2 - ${analysisFb2.outline_comment || ''}</li>
-              </ul>
-              <textarea id="t2-analysis-comment" class="editable w-full mt-2" rows="3">${fb2.overall_comment || ''}</textarea>
-            </div>
-
-            <!-- Introduction Feedback -->
-            <div>
-              <h6 class="font-semibold text-gray-700">Mở bài (Score: <span class="text-blue-600">${fb2.introduction_score || 0}/10</span>) | CEFR: <span class="text-purple-600">${fb2.cefr_level || 'N/A'}</span></h6>
-              <div class="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <strong>Strengths:</strong>
-                  <ul class="list-disc pl-5 space-y-1">
-                    ${introFb2.strengths?.map(s => `<li>${s}</li>`).join('') || '<li>None</li>'}
-                  </ul>
-                  <textarea id="t2-strengths" class="editable w-full mt-2" rows="3">${introFb2.strengths?.join('\n') || ''}</textarea>
-                </div>
-                <div>
-                  <strong>Weaknesses:</strong>
-                  <ul class="list-disc pl-5 space-y-1">
-                    ${introFb2.weaknesses?.map(w => `<li>${w}</li>`).join('') || '<li>None</li>'}
-                  </ul>
-                  <textarea id="t2-weaknesses" class="editable w-full mt-2" rows="3">${introFb2.weaknesses?.join('\n') || ''}</textarea>
-                </div>
-              </div>
-
-              <div class="mt-3">
-                <strong>Grammar Errors:</strong>
-                <ul class="list-disc pl-5 space-y-1 text-sm">
-                  ${grammarErrors2.map(e => `<li>Error: "${e.error}" → Correction: "${e.correction}"</li>`).join('') || '<li>None</li>'}
-                </ul>
-                <textarea id="t2-grammar" class="editable w-full mt-2" rows="3">${grammarErrors2.map(e => `${e.error} → ${e.correction}`).join('\n') || ''}</textarea>
-              </div>
-
-              <div class="mt-3">
-                <strong>Structure Breakdown (Scores):</strong>
-                <ul class="list-disc pl-5 space-y-1 text-sm">
-                  <li>Background: ${introFb2.structure_breakdown?.background || 0}/1</li>
-                  <li>Paraphrase: ${introFb2.structure_breakdown?.paraphrase || 0}/1.5</li>
-                  <li>Thesis: ${introFb2.structure_breakdown?.thesis || 0}/2</li>
-                  <li>General: ${introFb2.structure_breakdown?.general || 0}/0.5</li>
-                </ul>
-              </div>
-
-              <div class="mt-3">
-                <strong>Word Count Score:</strong> ${introFb2.word_count_score || 0}/1 (${introFb2.word_count || 0} words)
-              </div>
-            </div>
-
-            <!-- Suggestions -->
-            <div>
-              <h6 class="font-semibold text-gray-700">Improvement Suggestions:</h6>
-              <ul class="list-disc pl-5 space-y-1 text-sm">
-                ${suggestions2.map(s => `<li>${s}</li>`).join('') || '<li>None</li>'}
-              </ul>
-              <textarea id="t2-suggestions" class="editable w-full mt-2" rows="4">${suggestions2.join('\n') || ''}</textarea>
-            </div>
-          </div>
+        <!-- Suggestions -->
+        <div>
+          <h6 class="font-semibold text-gray-700">Improvement Suggestions:</h6>
+          <textarea id="t2-suggestions" class="editable w-full mt-2" rows="6">${suggestions2.map(s => `• ${s}`).join('\n') || '• None'}</textarea>
         </div>
       </div>
-    `;
+    </div>
+  </div>
+`;
+
 // === TOPIC 3 ===
 const t3 = work.topic3;
 const fb3 = data.teacherFeedback?.topic3 || data.aiFeedback?.topic3 || {};
@@ -494,72 +470,57 @@ document.getElementById('tab-topic3').innerHTML = `
 
     <!-- Detailed Feedback -->
     <div class="mt-6 bg-yellow-50 p-4 rounded-lg">
-      <h5 class="font-bold text-yellow-800 mb-2">DETAILED FEEDBACK (AI - Teacher edited)</h5>
+      <h5 class="font-bold text-yellow-800 mb-2">NHẬN XÉT & ĐÁNH GIÁ</h5>
       
       <div class="space-y-4">
         <!-- Analysis Feedback -->
         <div>
           <h6 class="font-semibold text-gray-700">Essay Analysis (Score: <span class="text-blue-600">${fb3.analysis_score || 0}/10</span>)</h6>
-          <ul class="list-disc pl-5 text-sm space-y-1">
-            <li>SS: ${analysisFb3.ss_correct ? '✅' : '❌'} - ${analysisFb3.ss_comment || ''}</li>
-            <li>IS: ${analysisFb3.is_correct ? '✅' : '❌'} - ${analysisFb3.is_comment || ''}</li>
-            <li>Q: ${analysisFb3.q_correct ? '✅' : '❌'} - ${analysisFb3.q_comment || ''}</li>
-            <li>T: ${analysisFb3.t_correct ? '✅' : '❌'} - ${analysisFb3.t_comment || ''}</li>
-            <li>Outline Score: ${analysisFb3.outline_score || 0}/2 - ${analysisFb3.outline_comment || ''}</li>
-          </ul>
-          <textarea id="t3-analysis-comment" class="editable w-full mt-2" rows="3">${fb3.overall_comment || ''}</textarea>
+          <textarea id="t3-analysis-full" class="editable w-full mt-2" rows="6">SS: ${analysisFb3.ss_correct ? '✅' : '❌'} - ${analysisFb3.ss_comment || ''}
+IS: ${analysisFb3.is_correct ? '✅' : '❌'} - ${analysisFb3.is_comment || ''}
+Q: ${analysisFb3.q_correct ? '✅' : '❌'} - ${analysisFb3.q_comment || ''}
+T: ${analysisFb3.t_correct ? '✅' : '❌'} - ${analysisFb3.t_comment || ''}
+Outline Score: ${analysisFb3.outline_score || 0}/2 - ${analysisFb3.outline_comment || ''}
+
+Overall: ${fb3.overall_comment || ''}</textarea>
         </div>
 
         <!-- Introduction Feedback -->
         <div>
           <h6 class="font-semibold text-gray-700">Introduction (Score: <span class="text-blue-600">${fb3.introduction_score || 0}/10</span>) | CEFR: <span class="text-purple-600">${fb3.cefr_level || 'N/A'}</span></h6>
-          <div class="grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <strong>Strengths:</strong>
-              <ul class="list-disc pl-5 space-y-1">
-                ${introFb3.strengths?.map(s => `<li>${s}</li>`).join('') || '<li>None</li>'}
-              </ul>
-              <textarea id="t3-strengths" class="editable w-full mt-2" rows="3">${introFb3.strengths?.join('\n') || ''}</textarea>
-            </div>
-            <div>
-              <strong>Weaknesses:</strong>
-              <ul class="list-disc pl-5 space-y-1">
-                ${introFb3.weaknesses?.map(w => `<li>${w}</li>`).join('') || '<li>None</li>'}
-              </ul>
-              <textarea id="t3-weaknesses" class="editable w-full mt-2" rows="3">${introFb3.weaknesses?.join('\n') || ''}</textarea>
-            </div>
+          
+          <div>
+            <strong>Strengths & Weaknesses:</strong>
+            <textarea id="t3-strengths-weaknesses" class="editable w-full mt-2" rows="8">STRENGTHS:
+${introFb3.strengths?.map(s => `• ${s}`).join('\n') || '• None'}
+
+WEAKNESSES:
+${introFb3.weaknesses?.map(w => `• ${w}`).join('\n') || '• None'}</textarea>
           </div>
 
           <div class="mt-3">
             <strong>Grammar Errors:</strong>
-            <ul class="list-disc pl-5 space-y-1 text-sm">
-              ${grammarErrors3.map(e => `<li>Error: "${e.error}" → Correction: "${e.correction}"</li>`).join('') || '<li>None</li>'}
-            </ul>
-            <textarea id="t3-grammar" class="editable w-full mt-2" rows="3">${grammarErrors3.map(e => `${e.error} → ${e.correction}`).join('\n') || ''}</textarea>
+            <textarea id="t3-grammar" class="editable w-full mt-2" rows="5">${grammarErrors3.map(e => `• Error: "${e.error}" → Correction: "${e.correction}"`).join('\n') || '• None'}</textarea>
           </div>
 
           <div class="mt-3">
             <strong>Structure Breakdown (Scores):</strong>
-            <ul class="list-disc pl-5 space-y-1 text-sm">
-              <li>Background: ${introFb3.structure_breakdown?.background || 0}/1</li>
-              <li>Paraphrase: ${introFb3.structure_breakdown?.paraphrase || 0}/1.5</li>
-              <li>Thesis: ${introFb3.structure_breakdown?.thesis || 0}/2</li>
-              <li>General: ${introFb3.structure_breakdown?.general || 0}/0.5</li>
-            </ul>
+            <textarea id="t3-structure" class="editable w-full mt-2" rows="4">Background: ${introFb3.structure_breakdown?.background || 0}/1
+Paraphrase: ${introFb3.structure_breakdown?.paraphrase || 0}/1.5
+Thesis: ${introFb3.structure_breakdown?.thesis || 0}/2
+General: ${introFb3.structure_breakdown?.general || 0}/0.5</textarea>
           </div>
 
           <div class="mt-3">
-            <strong>Word Count Score:</strong> ${introFb3.word_count_score || 0}/1 (${introFb3.word_count || 0} words)
+            <strong>Word Count Score:</strong>
+            <textarea id="t3-wordcount" class="editable w-full mt-2" rows="1">${introFb3.word_count_score || 0}/1 (${introFb3.word_count || 0} words)</textarea>
           </div>
         </div>
 
         <!-- Suggestions -->
         <div>
           <h6 class="font-semibold text-gray-700">Improvement Suggestions:</h6>
-          <ul class="list-disc pl-5 space-y-1 text-sm">
-            ${suggestions3.map(s => `<li>${s}</li>`).join('') || '<li>None</li>'}
-          </ul>
-          <textarea id="t3-suggestions" class="editable w-full mt-2" rows="4">${suggestions3.join('\n') || ''}</textarea>
+          <textarea id="t3-suggestions" class="editable w-full mt-2" rows="6">${suggestions3.map(s => `• ${s}`).join('\n') || '• None'}</textarea>
         </div>
       </div>
     </div>
@@ -602,72 +563,57 @@ document.getElementById('tab-topic4').innerHTML = `
 
     <!-- Detailed Feedback -->
     <div class="mt-6 bg-yellow-50 p-4 rounded-lg">
-      <h5 class="font-bold text-yellow-800 mb-2">DETAILED FEEDBACK (AI - Teacher edited)</h5>
+      <h5 class="font-bold text-yellow-800 mb-2">NHẬN XÉT & ĐÁNH GIÁ</h5>
       
       <div class="space-y-4">
         <!-- Analysis Feedback -->
         <div>
           <h6 class="font-semibold text-gray-700">Essay Analysis (Score: <span class="text-blue-600">${fb4.analysis_score || 0}/10</span>)</h6>
-          <ul class="list-disc pl-5 text-sm space-y-1">
-            <li>SS: ${analysisFb4.ss_correct ? '✅' : '❌'} - ${analysisFb4.ss_comment || ''}</li>
-            <li>IS: ${analysisFb4.is_correct ? '✅' : '❌'} - ${analysisFb4.is_comment || ''}</li>
-            <li>Q: ${analysisFb4.q_correct ? '✅' : '❌'} - ${analysisFb4.q_comment || ''}</li>
-            <li>T: ${analysisFb4.t_correct ? '✅' : '❌'} - ${analysisFb4.t_comment || ''}</li>
-            <li>Outline Score: ${analysisFb4.outline_score || 0}/2 - ${analysisFb4.outline_comment || ''}</li>
-          </ul>
-          <textarea id="t4-analysis-comment" class="editable w-full mt-2" rows="3">${fb4.overall_comment || ''}</textarea>
+          <textarea id="t4-analysis-full" class="editable w-full mt-2" rows="6">SS: ${analysisFb4.ss_correct ? '✅' : '❌'} - ${analysisFb4.ss_comment || ''}
+IS: ${analysisFb4.is_correct ? '✅' : '❌'} - ${analysisFb4.is_comment || ''}
+Q: ${analysisFb4.q_correct ? '✅' : '❌'} - ${analysisFb4.q_comment || ''}
+T: ${analysisFb4.t_correct ? '✅' : '❌'} - ${analysisFb4.t_comment || ''}
+Outline Score: ${analysisFb4.outline_score || 0}/2 - ${analysisFb4.outline_comment || ''}
+
+Overall: ${fb4.overall_comment || ''}</textarea>
         </div>
 
         <!-- Introduction Feedback -->
         <div>
           <h6 class="font-semibold text-gray-700">Introduction (Score: <span class="text-blue-600">${fb4.introduction_score || 0}/10</span>) | CEFR: <span class="text-purple-600">${fb4.cefr_level || 'N/A'}</span></h6>
-          <div class="grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <strong>Strengths:</strong>
-              <ul class="list-disc pl-5 space-y-1">
-                ${introFb4.strengths?.map(s => `<li>${s}</li>`).join('') || '<li>None</li>'}
-              </ul>
-              <textarea id="t4-strengths" class="editable w-full mt-2" rows="3">${introFb4.strengths?.join('\n') || ''}</textarea>
-            </div>
-            <div>
-              <strong>Weaknesses:</strong>
-              <ul class="list-disc pl-5 space-y-1">
-                ${introFb4.weaknesses?.map(w => `<li>${w}</li>`).join('') || '<li>None</li>'}
-              </ul>
-              <textarea id="t4-weaknesses" class="editable w-full mt-2" rows="3">${introFb4.weaknesses?.join('\n') || ''}</textarea>
-            </div>
+          
+          <div>
+            <strong>Strengths & Weaknesses:</strong>
+            <textarea id="t4-strengths-weaknesses" class="editable w-full mt-2" rows="8">STRENGTHS:
+${introFb4.strengths?.map(s => `• ${s}`).join('\n') || '• None'}
+
+WEAKNESSES:
+${introFb4.weaknesses?.map(w => `• ${w}`).join('\n') || '• None'}</textarea>
           </div>
 
           <div class="mt-3">
             <strong>Grammar Errors:</strong>
-            <ul class="list-disc pl-5 space-y-1 text-sm">
-              ${grammarErrors4.map(e => `<li>Error: "${e.error}" → Correction: "${e.correction}"</li>`).join('') || '<li>None</li>'}
-            </ul>
-            <textarea id="t4-grammar" class="editable w-full mt-2" rows="3">${grammarErrors4.map(e => `${e.error} → ${e.correction}`).join('\n') || ''}</textarea>
+            <textarea id="t4-grammar" class="editable w-full mt-2" rows="5">${grammarErrors4.map(e => `• Error: "${e.error}" → Correction: "${e.correction}"`).join('\n') || '• None'}</textarea>
           </div>
 
           <div class="mt-3">
             <strong>Structure Breakdown (Scores):</strong>
-            <ul class="list-disc pl-5 space-y-1 text-sm">
-              <li>Background: ${introFb4.structure_breakdown?.background || 0}/1</li>
-              <li>Paraphrase: ${introFb4.structure_breakdown?.paraphrase || 0}/1.5</li>
-              <li>Thesis: ${introFb4.structure_breakdown?.thesis || 0}/2</li>
-              <li>General: ${introFb4.structure_breakdown?.general || 0}/0.5</li>
-            </ul>
+            <textarea id="t4-structure" class="editable w-full mt-2" rows="4">Background: ${introFb4.structure_breakdown?.background || 0}/1
+Paraphrase: ${introFb4.structure_breakdown?.paraphrase || 0}/1.5
+Thesis: ${introFb4.structure_breakdown?.thesis || 0}/2
+General: ${introFb4.structure_breakdown?.general || 0}/0.5</textarea>
           </div>
 
           <div class="mt-3">
-            <strong>Word Count Score:</strong> ${introFb4.word_count_score || 0}/1 (${introFb4.word_count || 0} words)
+            <strong>Word Count Score:</strong>
+            <textarea id="t4-wordcount" class="editable w-full mt-2" rows="1">${introFb4.word_count_score || 0}/1 (${introFb4.word_count || 0} words)</textarea>
           </div>
         </div>
 
         <!-- Suggestions -->
         <div>
           <h6 class="font-semibold text-gray-700">Improvement Suggestions:</h6>
-          <ul class="list-disc pl-5 space-y-1 text-sm">
-            ${suggestions4.map(s => `<li>${s}</li>`).join('') || '<li>None</li>'}
-          </ul>
-          <textarea id="t4-suggestions" class="editable w-full mt-2" rows="4">${suggestions4.join('\n') || ''}</textarea>
+          <textarea id="t4-suggestions" class="editable w-full mt-2" rows="6">${suggestions4.map(s => `• ${s}`).join('\n') || '• None'}</textarea>
         </div>
       </div>
     </div>
@@ -710,77 +656,64 @@ document.getElementById('tab-topic5').innerHTML = `
 
     <!-- Detailed Feedback -->
     <div class="mt-6 bg-yellow-50 p-4 rounded-lg">
-      <h5 class="font-bold text-yellow-800 mb-2">DETAILED FEEDBACK (AI - Teacher edited)</h5>
+      <h5 class="font-bold text-yellow-800 mb-2">NHẬN XÉT & ĐÁNH GIÁ</h5>
       
       <div class="space-y-4">
         <!-- Analysis Feedback -->
         <div>
           <h6 class="font-semibold text-gray-700">Essay Analysis (Score: <span class="text-blue-600">${fb5.analysis_score || 0}/10</span>)</h6>
-          <ul class="list-disc pl-5 text-sm space-y-1">
-            <li>SS: ${analysisFb5.ss_correct ? '✅' : '❌'} - ${analysisFb5.ss_comment || ''}</li>
-            <li>IS: ${analysisFb5.is_correct ? '✅' : '❌'} - ${analysisFb5.is_comment || ''}</li>
-            <li>Q: ${analysisFb5.q_correct ? '✅' : '❌'} - ${analysisFb5.q_comment || ''}</li>
-            <li>T: ${analysisFb5.t_correct ? '✅' : '❌'} - ${analysisFb5.t_comment || ''}</li>
-            <li>Outline Score: ${analysisFb5.outline_score || 0}/2 - ${analysisFb5.outline_comment || ''}</li>
-          </ul>
-          <textarea id="t5-analysis-comment" class="editable w-full mt-2" rows="3">${fb5.overall_comment || ''}</textarea>
+          <textarea id="t5-analysis-full" class="editable w-full mt-2" rows="6">SS: ${analysisFb5.ss_correct ? '✅' : '❌'} - ${analysisFb5.ss_comment || ''}
+IS: ${analysisFb5.is_correct ? '✅' : '❌'} - ${analysisFb5.is_comment || ''}
+Q: ${analysisFb5.q_correct ? '✅' : '❌'} - ${analysisFb5.q_comment || ''}
+T: ${analysisFb5.t_correct ? '✅' : '❌'} - ${analysisFb5.t_comment || ''}
+Outline Score: ${analysisFb5.outline_score || 0}/2 - ${analysisFb5.outline_comment || ''}
+
+Overall: ${fb5.overall_comment || ''}</textarea>
         </div>
 
         <!-- Introduction Feedback -->
         <div>
           <h6 class="font-semibold text-gray-700">Introduction (Score: <span class="text-blue-600">${fb5.introduction_score || 0}/10</span>) | CEFR: <span class="text-purple-600">${fb5.cefr_level || 'N/A'}</span></h6>
-          <div class="grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <strong>Strengths:</strong>
-              <ul class="list-disc pl-5 space-y-1">
-                ${introFb5.strengths?.map(s => `<li>${s}</li>`).join('') || '<li>None</li>'}
-              </ul>
-              <textarea id="t5-strengths" class="editable w-full mt-2" rows="3">${introFb5.strengths?.join('\n') || ''}</textarea>
-            </div>
-            <div>
-              <strong>Weaknesses:</strong>
-              <ul class="list-disc pl-5 space-y-1">
-                ${introFb5.weaknesses?.map(w => `<li>${w}</li>`).join('') || '<li>None</li>'}
-              </ul>
-              <textarea id="t5-weaknesses" class="editable w-full mt-2" rows="3">${introFb5.weaknesses?.join('\n') || ''}</textarea>
-            </div>
+          
+          <div>
+            <strong>Strengths & Weaknesses:</strong>
+            <textarea id="t5-strengths-weaknesses" class="editable w-full mt-2" rows="8">STRENGTHS:
+${introFb5.strengths?.map(s => `• ${s}`).join('\n') || '• None'}
+
+WEAKNESSES:
+${introFb5.weaknesses?.map(w => `• ${w}`).join('\n') || '• None'}</textarea>
           </div>
 
           <div class="mt-3">
             <strong>Grammar Errors:</strong>
-            <ul class="list-disc pl-5 space-y-1 text-sm">
-              ${grammarErrors5.map(e => `<li>Error: "${e.error}" → Correction: "${e.correction}"</li>`).join('') || '<li>None</li>'}
-            </ul>
-            <textarea id="t5-grammar" class="editable w-full mt-2" rows="3">${grammarErrors5.map(e => `${e.error} → ${e.correction}`).join('\n') || ''}</textarea>
-          </div>
-
-          <div class="mt-3">
-            <strong>Structure Breakdown (Scores):</strong>
-            <ul class="list-disc pl-5 space-y-1 text-sm">
-              <li>Background: ${introFb5.structure_breakdown?.background || 0}/1</li>
-              <li>Paraphrase: ${introFb5.structure_breakdown?.paraphrase || 0}/1.5</li>
-              <li>Thesis: ${introFb5.structure_breakdown?.thesis || 0}/2</li>
-              <li>General: ${introFb5.structure_breakdown?.general || 0}/0.5</li>
-            </ul>
-          </div>
-
-          <div class="mt-3">
-            <strong>Word Count Score:</strong> ${introFb5.word_count_score || 0}/1 (${introFb5.word_count || 0} words)
-          </div>
-        </div>
-
-        <!-- Suggestions -->
-        <div>
-          <h6 class="font-semibold text-gray-700">Improvement Suggestions:</h6>
-          <ul class="list-disc pl-5 space-y-1 text-sm">
-            ${suggestions5.map(s => `<li>${s}</li>`).join('') || '<li>None</li>'}
-          </ul>
-          <textarea id="t5-suggestions" class="editable w-full mt-2" rows="4">${suggestions5.join('\n') || ''}</textarea>
-        </div>
+            <textarea id="t5-grammar" class="editable w-full mt-2" rows="5">${grammarErrors5.map(e => `• Error: "e.error"→Correction:"{e.error}" → Correction: "
+e.error"→Correction:"{e.correction}"`).join('\n') || '• None'}
+</textarea>
+</div>
+      <div class="mt-3">
+        <strong>Structure Breakdown (Scores):</strong>
+        <textarea id="t5-structure" class="editable w-full mt-2" rows="4">Background: ${introFb5.structure_breakdown?.background || 0}/1
+Paraphrase: ${introFb5.structure_breakdown?.paraphrase || 0}/1.5
+Thesis: ${introFb5.structure_breakdown?.thesis || 0}/2
+General: ${introFb5.structure_breakdown?.general || 0}/0.5</textarea>
+</div>
+      <div class="mt-3">
+        <strong>Word Count Score:</strong>
+        <textarea id="t5-wordcount" class="editable w-full mt-2" rows="1">${introFb5.word_count_score || 0}/1 (${introFb5.word_count || 0} words)</textarea>
       </div>
     </div>
+
+    <!-- Suggestions -->
+    <div>
+      <h6 class="font-semibold text-gray-700">Improvement Suggestions:</h6>
+      <textarea id="t5-suggestions" class="editable w-full mt-2" rows="6">${suggestions5.map(s => `• ${s}`).join('\n') || '• None'}</textarea>
+    </div>
+  </div>
+</div>
   </div>
 `;
+
+
     // === Tab Statistics (Work statistics for 5 topics) ===
 document.getElementById('tab-stats').innerHTML = `
   <div class="bg-green-50 p-4 rounded-lg">
@@ -797,7 +730,11 @@ document.getElementById('tab-stats').innerHTML = `
     </div>
   </div>
 `;
-  }
+
+  setTimeout(() => {
+    autoResizeTextareas();
+  }, 100);
+}
 
   function showTab(tab) {
     document.querySelectorAll('#studentDetail > div[id^="tab-"]').forEach(d => d.classList.add('hidden'));
@@ -834,95 +771,189 @@ function exportPDF() {
       <meta charset="UTF-8">
       <title>Feedback Report - ${studentName}</title>
       <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-          font-family: 'Segoe UI', Arial, sans-serif;
-          padding: 20px;
-          max-width: 900px;
-          margin: 0 auto;
-          line-height: 1.6;
+          font-family: 'Segoe UI', 'Arial', sans-serif;
+          padding: 30px;
+          background: #ffffff;
+          color: #333;
+          line-height: 1.8;
         }
-        h1 { 
-          color: #2e7d32; 
-          border-bottom: 3px solid #4CAF50; 
-          padding-bottom: 10px; 
+        
+        .header {
+          background: linear-gradient(135deg, #4CAF50 0%, #2e7d32 100%);
+          color: white;
+          padding: 30px;
+          border-radius: 10px;
+          margin-bottom: 30px;
+          box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-        h2 { 
-          color: #1976d2; 
-          margin-top: 30px; 
-          page-break-before: always; 
+        
+        .header h1 {
+          font-size: 32px;
+          margin-bottom: 15px;
+          display: flex;
+          align-items: center;
+          gap: 10px;
         }
-        h3 { 
-          color: #f57c00; 
-          margin-top: 20px; 
+        
+        .header-info {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 15px;
+          margin-top: 20px;
+          font-size: 14px;
         }
-        .section { 
-          margin-bottom: 30px; 
-          padding: 15px; 
-          background: #f5f5f5; 
-          border-left: 4px solid #4CAF50; 
+        
+        .info-box {
+          background: rgba(255,255,255,0.2);
+          padding: 10px 15px;
+          border-radius: 5px;
+          backdrop-filter: blur(10px);
         }
-        .score { 
-          color: #d32f2f; 
-          font-weight: bold; 
+        
+        .info-box strong {
+          display: block;
+          font-size: 11px;
+          opacity: 0.9;
+          margin-bottom: 3px;
         }
+        
+        .topic-section {
+          page-break-before: always;
+          margin-bottom: 40px;
+          border: 2px solid #e0e0e0;
+          border-radius: 12px;
+          overflow: hidden;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        
+        .topic-section:first-of-type {
+          page-break-before: auto;
+        }
+        
+        .topic-header {
+          padding: 20px 25px;
+          font-size: 24px;
+          font-weight: bold;
+          color: white;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+        
+        .topic1-header { background: linear-gradient(135deg, #2196F3, #1976d2); }
+        .topic2-header { background: linear-gradient(135deg, #4CAF50, #388e3c); }
+        .topic3-header { background: linear-gradient(135deg, #00BCD4, #0097a7); }
+        .topic4-header { background: linear-gradient(135deg, #FF9800, #f57c00); }
+        .topic5-header { background: linear-gradient(135deg, #E91E63, #c2185b); }
+        .stats-header { background: linear-gradient(135deg, #9C27B0, #7b1fa2); }
+        
+        .topic-content {
+          padding: 25px;
+          background: #fafafa;
+          font-size: 13px;
+          white-space: pre-wrap;
+          font-family: 'Consolas', 'Monaco', monospace;
+        }
+        
+        .footer {
+          margin-top: 50px;
+          padding-top: 20px;
+          border-top: 2px solid #e0e0e0;
+          text-align: center;
+          color: #999;
+          font-size: 11px;
+        }
+        
+        .logo {
+          width: 40px;
+          height: 40px;
+          background: white;
+          border-radius: 50%;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 20px;
+        }
+        
         @media print {
           body { 
             print-color-adjust: exact; 
             -webkit-print-color-adjust: exact; 
           }
-          .section { 
+          .topic-section { 
             page-break-inside: avoid; 
+          }
+          .header {
+            box-shadow: none;
           }
         }
       </style>
     </head>
     <body>
-      <h1>📝 FCE Writing Feedback Report</h1>
-      <p><strong>Học sinh:</strong> ${studentName}</p>
-      <p><strong>Tuần:</strong> Week ${currentWeek}</p>
-      <p><strong>Ngày xuất:</strong> ${new Date().toLocaleDateString('vi-VN')}</p>
-      
-      <div class="section">
-        <h2>📘 TOPIC 1</h2>
-        <pre style="white-space: pre-wrap; font-family: inherit;">${topic1Content}</pre>
+      <div class="header">
+        <h1>
+          <span class="logo">📝</span>
+          FCE Writing Feedback Report
+        </h1>
+        <div class="header-info">
+          <div class="info-box">
+            <strong>HỌC SINH</strong>
+            <div>${studentName}</div>
+          </div>
+          <div class="info-box">
+            <strong>TUẦN HỌC</strong>
+            <div>Week ${currentWeek}</div>
+          </div>
+          <div class="info-box">
+            <strong>NGÀY XUẤT</strong>
+            <div>${new Date().toLocaleDateString('vi-VN')}</div>
+          </div>
+        </div>
       </div>
       
-      <div class="section">
-        <h2>📗 TOPIC 2</h2>
-        <pre style="white-space: pre-wrap; font-family: inherit;">${topic2Content}</pre>
+      <div class="topic-section">
+        <div class="topic-header topic1-header">📘 TOPIC 1</div>
+        <div class="topic-content">${topic1Content}</div>
       </div>
       
-      <div class="section">
-        <h2>📙 TOPIC 3</h2>
-        <pre style="white-space: pre-wrap; font-family: inherit;">${topic3Content}</pre>
+      <div class="topic-section">
+        <div class="topic-header topic2-header">📗 TOPIC 2</div>
+        <div class="topic-content">${topic2Content}</div>
       </div>
       
-      <div class="section">
-        <h2>📕 TOPIC 4</h2>
-        <pre style="white-space: pre-wrap; font-family: inherit;">${topic4Content}</pre>
+      <div class="topic-section">
+        <div class="topic-header topic3-header">📙 TOPIC 3</div>
+        <div class="topic-content">${topic3Content}</div>
       </div>
       
-      <div class="section">
-        <h2>📔 TOPIC 5</h2>
-        <pre style="white-space: pre-wrap; font-family: inherit;">${topic5Content}</pre>
+      <div class="topic-section">
+        <div class="topic-header topic4-header">📕 TOPIC 4</div>
+        <div class="topic-content">${topic4Content}</div>
       </div>
       
-      <div class="section">
-        <h2>📊 STATISTICS</h2>
-        <pre style="white-space: pre-wrap; font-family: inherit;">${statsContent}</pre>
+      <div class="topic-section">
+        <div class="topic-header topic5-header">📔 TOPIC 5</div>
+        <div class="topic-content">${topic5Content}</div>
       </div>
       
-      <hr style="margin-top: 40px;">
-      <p style="text-align: center; color: #666; font-size: 12px;">
-        Generated by LIME FCE Writing Teacher Dashboard
-      </p>
+      <div class="topic-section">
+        <div class="topic-header stats-header">📊 STATISTICS</div>
+        <div class="topic-content">${statsContent}</div>
+      </div>
+      
+      <div class="footer">
+        <p><strong>LIME English Center</strong></p>
+        <p>Generated by FCE Writing Teacher Dashboard System</p>
+        <p>© 2025 All Rights Reserved</p>
+      </div>
     </body>
     </html>
   `);
   
   printWindow.document.close();
   
-  // Đợi load xong rồi mở hộp thoại in
   setTimeout(() => {
     printWindow.print();
   }, 500);
@@ -1039,7 +1070,21 @@ function saveEditedFeedback() {
   .then(r => r.json())
   .then(res => alert(res.status === 'success' ? 'Saved!' : 'Error: ' + res.message));
 }
-
+// Auto-resize all editable textareas
+function autoResizeTextareas() {
+  document.querySelectorAll('.editable').forEach(textarea => {
+    // Reset height to recalculate
+    textarea.style.height = 'auto';
+    // Set height based on scrollHeight
+    textarea.style.height = (textarea.scrollHeight + 5) + 'px';
+    
+    // Add input listener for dynamic resize
+    textarea.addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = (this.scrollHeight + 5) + 'px';
+    });
+  });
+}
   </script>
 
 </body>
