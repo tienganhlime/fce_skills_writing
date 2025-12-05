@@ -279,15 +279,12 @@ const t5 = work.topic5;
 {
 const fb1 = data.teacherFeedback?.topic1 || data.aiFeedback?.topic1 || {};
 
-// ✨ ĐỌC VIETNAMESE FEEDBACK
-const vnFeedback = fb1.vietnamese_feedback || {};
-const analysisFb = fb1.analysis_feedback || {};
-const introFb = fb1.introduction_feedback || {};
-
-// ✨ ƯU TIÊN TIẾNG VIỆT
-const strengthsVN = vnFeedback.strengths_vn || introFb.strengths || [];
-const weaknessesVN = vnFeedback.weaknesses_vn || introFb.weaknesses || [];
-const suggestions = vnFeedback.suggestions_vn || fb1.improvement_suggestions || [];
+// ✅ ĐƠN GIẢN: Lấy trực tiếp từ feedback đã lưu
+const strengthsVN = fb1.strengths_vn || [];
+const weaknessesVN = fb1.weaknesses_vn || [];
+const suggestions = fb1.suggestions_vn || [];
+const analysisText = fb1.analysis_full || '';
+const structureText = fb1.structure_breakdown || '';
 
 document.getElementById('tab-topic1').innerHTML = `
   <div class="bg-gradient-to-r from-blue-50 to-blue-100 p-5 rounded-xl">
@@ -322,39 +319,28 @@ document.getElementById('tab-topic1').innerHTML = `
       <div class="space-y-4">
         <!-- Analysis Feedback -->
         <div>
-          <h6 class="font-semibold text-gray-700">Phân tích đề (Score: <span class="text-blue-600">${fb1.analysis_score || 0}/10</span>)</h6>
-          <textarea id="t1-analysis-full" class="editable w-full mt-2" rows="6">SS: ${analysisFb.ss_correct ? '✅' : '❌'} - ${analysisFb.ss_comment || ''}
-IS: ${analysisFb.is_correct ? '✅' : '❌'} - ${analysisFb.is_comment || ''}
-Q: ${analysisFb.q_correct ? '✅' : '❌'} - ${analysisFb.q_comment || ''}
-T: ${analysisFb.t_correct ? '✅' : '❌'} - ${analysisFb.t_comment || ''}
-Outline Score: ${analysisFb.outline_score || 0}/2 - ${analysisFb.outline_comment || ''}
-
-Overall: ${vnFeedback.summary || fb1.overall_comment || ''}</textarea>
-        </div>
+  <h6 class="font-semibold text-gray-700">Phân tích đề</h6>
+  <textarea id="t1-analysis-full" class="editable w-full mt-2" rows="6">${analysisText}</textarea>
+</div>
 
         <!-- Introduction Feedback -->
-        <div>
-          <h6 class="font-semibold text-gray-700">Mở bài (Score: <span class="text-blue-600">${fb1.introduction_score || 0}/10</span>) | CEFR: <span class="text-purple-600">${fb1.cefr_level || 'N/A'}</span></h6>
-          
-          <div>
-            <strong>Điểm mạnh & Điểm yếu:</strong>
-            <textarea id="t1-strengths-weaknesses" class="editable w-full mt-2" rows="8">ĐIỂM MẠNH:
+       <div>
+  <h6 class="font-semibold text-gray-700">Mở bài</h6>
+  
+  <div>
+    <strong>Điểm mạnh & Điểm yếu:</strong>
+    <textarea id="t1-strengths-weaknesses" class="editable w-full mt-2" rows="8">ĐIỂM MẠNH:
 ${strengthsVN.map(s => `• ${s}`).join('\n') || '• Chưa có'}
 
 ĐIỂM YẾU:
 ${weaknessesVN.map(w => `• ${w}`).join('\n') || '• Chưa có'}</textarea>
-          </div>
+  </div>
 
-          <div class="mt-3">
-            <strong>Breakdown điểm số chi tiết:</strong>
-            <textarea id="t1-structure" class="editable w-full mt-2" rows="5">Background (Nền/Bối cảnh): ${introFb.structure_breakdown?.background || 0}/1
-Paraphrase (Diễn đạt lại đề): ${introFb.structure_breakdown?.paraphrase || 0}/1.5
-Thesis (Câu chủ đề/Quan điểm): ${introFb.structure_breakdown?.thesis || 0}/2
-General (Tổng quan/Chuyển ý): ${introFb.structure_breakdown?.general || 0}/0.5
-Word Count (Số từ): ${introFb.word_count_score || 0}/1 (${introFb.word_count || 0} words)</textarea>
-          </div>
-        </div>
-
+  <div class="mt-3">
+    <strong>Breakdown điểm số chi tiết:</strong>
+    <textarea id="t1-structure" class="editable w-full mt-2" rows="5">${structureText}</textarea>
+  </div>
+</div>
         <!-- Suggestions -->
         <div>
           <h6 class="font-semibold text-gray-700">Gợi ý cải thiện:</h6>
@@ -370,13 +356,12 @@ Word Count (Số từ): ${introFb.word_count_score || 0}/1 (${introFb.word_count
 {
 const fb2 = data.teacherFeedback?.topic2 || data.aiFeedback?.topic2 || {};
 
-const vnFeedback = fb2.vietnamese_feedback || {};
-const analysisFb = fb2.analysis_feedback || {};
-const introFb = fb2.introduction_feedback || {};
-
-const strengthsVN = vnFeedback.strengths_vn || introFb.strengths || [];
-const weaknessesVN = vnFeedback.weaknesses_vn || introFb.weaknesses || [];
-const suggestions = vnFeedback.suggestions_vn || fb2.improvement_suggestions || [];
+// ✅ ĐƠN GIẢN: Lấy trực tiếp từ feedback đã lưu
+const strengthsVN = fb2.strengths_vn || [];
+const weaknessesVN = fb2.weaknesses_vn || [];
+const suggestions = fb2.suggestions_vn || [];
+const analysisText = fb2.analysis_full || '';
+const structureText = fb2.structure_breakdown || '';
 
 document.getElementById('tab-topic2').innerHTML = `
   <div class="bg-gradient-to-r from-green-50 to-green-100 p-5 rounded-xl">
@@ -411,19 +396,13 @@ document.getElementById('tab-topic2').innerHTML = `
       <div class="space-y-4">
         <!-- Analysis Feedback -->
         <div>
-          <h6 class="font-semibold text-gray-700">Phân tích đề (Score: <span class="text-blue-600">${fb2.analysis_score || 0}/10</span>)</h6>
-          <textarea id="t2-analysis-full" class="editable w-full mt-2" rows="6">SS: ${analysisFb.ss_correct ? '✅' : '❌'} - ${analysisFb.ss_comment || ''}
-IS: ${analysisFb.is_correct ? '✅' : '❌'} - ${analysisFb.is_comment || ''}
-Q: ${analysisFb.q_correct ? '✅' : '❌'} - ${analysisFb.q_comment || ''}
-T: ${analysisFb.t_correct ? '✅' : '❌'} - ${analysisFb.t_comment || ''}
-Outline Score: ${analysisFb.outline_score || 0}/2 - ${analysisFb.outline_comment || ''}
-
-Overall: ${vnFeedback.summary || fb2.overall_comment || ''}</textarea>
+          <h6 class="font-semibold text-gray-700">Phân tích đề</h6>
+          <textarea id="t2-analysis-full" class="editable w-full mt-2" rows="6">${analysisText}</textarea>
         </div>
 
         <!-- Introduction Feedback -->
         <div>
-          <h6 class="font-semibold text-gray-700">Mở bài (Score: <span class="text-blue-600">${fb2.introduction_score || 0}/10</span>) | CEFR: <span class="text-purple-600">${fb2.cefr_level || 'N/A'}</span></h6>
+          <h6 class="font-semibold text-gray-700">Mở bài</h6>
           
           <div>
             <strong>Điểm mạnh & Điểm yếu:</strong>
@@ -436,11 +415,7 @@ ${weaknessesVN.map(w => `• ${w}`).join('\n') || '• Chưa có'}</textarea>
 
           <div class="mt-3">
             <strong>Breakdown điểm số chi tiết:</strong>
-            <textarea id="t2-structure" class="editable w-full mt-2" rows="5">Background (Nền/Bối cảnh): ${introFb.structure_breakdown?.background || 0}/1
-Paraphrase (Diễn đạt lại đề): ${introFb.structure_breakdown?.paraphrase || 0}/1.5
-Thesis (Câu chủ đề/Quan điểm): ${introFb.structure_breakdown?.thesis || 0}/2
-General (Tổng quan/Chuyển ý): ${introFb.structure_breakdown?.general || 0}/0.5
-Word Count (Số từ): ${introFb.word_count_score || 0}/1 (${introFb.word_count || 0} words)</textarea>
+            <textarea id="t2-structure" class="editable w-full mt-2" rows="5">${structureText}</textarea>
           </div>
         </div>
 
@@ -459,13 +434,12 @@ Word Count (Số từ): ${introFb.word_count_score || 0}/1 (${introFb.word_count
 {
 const fb3 = data.teacherFeedback?.topic3 || data.aiFeedback?.topic3 || {};
 
-const vnFeedback = fb3.vietnamese_feedback || {};
-const analysisFb = fb3.analysis_feedback || {};
-const introFb = fb3.introduction_feedback || {};
-
-const strengthsVN = vnFeedback.strengths_vn || introFb.strengths || [];
-const weaknessesVN = vnFeedback.weaknesses_vn || introFb.weaknesses || [];
-const suggestions = vnFeedback.suggestions_vn || fb3.improvement_suggestions || [];
+// ✅ ĐƠN GIẢN: Lấy trực tiếp từ feedback đã lưu
+const strengthsVN = fb3.strengths_vn || [];
+const weaknessesVN = fb3.weaknesses_vn || [];
+const suggestions = fb3.suggestions_vn || [];
+const analysisText = fb3.analysis_full || '';
+const structureText = fb3.structure_breakdown || '';
 
 document.getElementById('tab-topic3').innerHTML = `
   <div class="bg-gradient-to-r from-teal-50 to-teal-100 p-5 rounded-xl">
@@ -496,18 +470,12 @@ document.getElementById('tab-topic3').innerHTML = `
       
       <div class="space-y-4">
         <div>
-          <h6 class="font-semibold text-gray-700">Phân tích đề (Score: <span class="text-blue-600">${fb3.analysis_score || 0}/10</span>)</h6>
-          <textarea id="t3-analysis-full" class="editable w-full mt-2" rows="6">SS: ${analysisFb.ss_correct ? '✅' : '❌'} - ${analysisFb.ss_comment || ''}
-IS: ${analysisFb.is_correct ? '✅' : '❌'} - ${analysisFb.is_comment || ''}
-Q: ${analysisFb.q_correct ? '✅' : '❌'} - ${analysisFb.q_comment || ''}
-T: ${analysisFb.t_correct ? '✅' : '❌'} - ${analysisFb.t_comment || ''}
-Outline Score: ${analysisFb.outline_score || 0}/2 - ${analysisFb.outline_comment || ''}
-
-Overall: ${vnFeedback.summary || fb3.overall_comment || ''}</textarea>
+          <h6 class="font-semibold text-gray-700">Phân tích đề</h6>
+          <textarea id="t3-analysis-full" class="editable w-full mt-2" rows="6">${analysisText}</textarea>
         </div>
 
         <div>
-          <h6 class="font-semibold text-gray-700">Mở bài (Score: <span class="text-blue-600">${fb3.introduction_score || 0}/10</span>) | CEFR: <span class="text-purple-600">${fb3.cefr_level || 'N/A'}</span></h6>
+          <h6 class="font-semibold text-gray-700">Mở bài</h6>
           
           <div>
             <strong>Điểm mạnh & Điểm yếu:</strong>
@@ -520,11 +488,7 @@ ${weaknessesVN.map(w => `• ${w}`).join('\n') || '• Chưa có'}</textarea>
 
           <div class="mt-3">
             <strong>Breakdown điểm số chi tiết:</strong>
-            <textarea id="t3-structure" class="editable w-full mt-2" rows="5">Background (Nền/Bối cảnh): ${introFb.structure_breakdown?.background || 0}/1
-Paraphrase (Diễn đạt lại đề): ${introFb.structure_breakdown?.paraphrase || 0}/1.5
-Thesis (Câu chủ đề/Quan điểm): ${introFb.structure_breakdown?.thesis || 0}/2
-General (Tổng quan/Chuyển ý): ${introFb.structure_breakdown?.general || 0}/0.5
-Word Count (Số từ): ${introFb.word_count_score || 0}/1 (${introFb.word_count || 0} words)</textarea>
+            <textarea id="t3-structure" class="editable w-full mt-2" rows="5">${structureText}</textarea>
           </div>
         </div>
 
@@ -542,13 +506,12 @@ Word Count (Số từ): ${introFb.word_count_score || 0}/1 (${introFb.word_count
 {
 const fb4 = data.teacherFeedback?.topic4 || data.aiFeedback?.topic4 || {};
 
-const vnFeedback = fb4.vietnamese_feedback || {};
-const analysisFb = fb4.analysis_feedback || {};
-const introFb = fb4.introduction_feedback || {};
-
-const strengthsVN = vnFeedback.strengths_vn || introFb.strengths || [];
-const weaknessesVN = vnFeedback.weaknesses_vn || introFb.weaknesses || [];
-const suggestions = vnFeedback.suggestions_vn || fb4.improvement_suggestions || [];
+// ✅ ĐƠN GIẢN: Lấy trực tiếp từ feedback đã lưu
+const strengthsVN = fb4.strengths_vn || [];
+const weaknessesVN = fb4.weaknesses_vn || [];
+const suggestions = fb4.suggestions_vn || [];
+const analysisText = fb4.analysis_full || '';
+const structureText = fb4.structure_breakdown || '';
 
 document.getElementById('tab-topic4').innerHTML = `
   <div class="bg-gradient-to-r from-orange-50 to-orange-100 p-5 rounded-xl">
@@ -579,18 +542,12 @@ document.getElementById('tab-topic4').innerHTML = `
       
       <div class="space-y-4">
         <div>
-          <h6 class="font-semibold text-gray-700">Phân tích đề (Score: <span class="text-blue-600">${fb4.analysis_score || 0}/10</span>)</h6>
-          <textarea id="t4-analysis-full" class="editable w-full mt-2" rows="6">SS: ${analysisFb.ss_correct ? '✅' : '❌'} - ${analysisFb.ss_comment || ''}
-IS: ${analysisFb.is_correct ? '✅' : '❌'} - ${analysisFb.is_comment || ''}
-Q: ${analysisFb.q_correct ? '✅' : '❌'} - ${analysisFb.q_comment || ''}
-T: ${analysisFb.t_correct ? '✅' : '❌'} - ${analysisFb.t_comment || ''}
-Outline Score: ${analysisFb.outline_score || 0}/2 - ${analysisFb.outline_comment || ''}
-
-Overall: ${vnFeedback.summary || fb4.overall_comment || ''}</textarea>
+          <h6 class="font-semibold text-gray-700">Phân tích đề</h6>
+          <textarea id="t4-analysis-full" class="editable w-full mt-2" rows="6">${analysisText}</textarea>
         </div>
 
         <div>
-          <h6 class="font-semibold text-gray-700">Mở bài (Score: <span class="text-blue-600">${fb4.introduction_score || 0}/10</span>) | CEFR: <span class="text-purple-600">${fb4.cefr_level || 'N/A'}</span></h6>
+          <h6 class="font-semibold text-gray-700">Mở bài</h6>
           
           <div>
             <strong>Điểm mạnh & Điểm yếu:</strong>
@@ -603,11 +560,7 @@ ${weaknessesVN.map(w => `• ${w}`).join('\n') || '• Chưa có'}</textarea>
 
           <div class="mt-3">
             <strong>Breakdown điểm số chi tiết:</strong>
-            <textarea id="t4-structure" class="editable w-full mt-2" rows="5">Background (Nền/Bối cảnh): ${introFb.structure_breakdown?.background || 0}/1
-Paraphrase (Diễn đạt lại đề): ${introFb.structure_breakdown?.paraphrase || 0}/1.5
-Thesis (Câu chủ đề/Quan điểm): ${introFb.structure_breakdown?.thesis || 0}/2
-General (Tổng quan/Chuyển ý): ${introFb.structure_breakdown?.general || 0}/0.5
-Word Count (Số từ): ${introFb.word_count_score || 0}/1 (${introFb.word_count || 0} words)</textarea>
+            <textarea id="t4-structure" class="editable w-full mt-2" rows="5">${structureText}</textarea>
           </div>
         </div>
 
@@ -625,13 +578,12 @@ Word Count (Số từ): ${introFb.word_count_score || 0}/1 (${introFb.word_count
 {
 const fb5 = data.teacherFeedback?.topic5 || data.aiFeedback?.topic5 || {};
 
-const vnFeedback = fb5.vietnamese_feedback || {};
-const analysisFb = fb5.analysis_feedback || {};
-const introFb = fb5.introduction_feedback || {};
-
-const strengthsVN = vnFeedback.strengths_vn || introFb.strengths || [];
-const weaknessesVN = vnFeedback.weaknesses_vn || introFb.weaknesses || [];
-const suggestions = vnFeedback.suggestions_vn || fb5.improvement_suggestions || [];
+// ✅ ĐƠN GIẢN: Lấy trực tiếp từ feedback đã lưu
+const strengthsVN = fb5.strengths_vn || [];
+const weaknessesVN = fb5.weaknesses_vn || [];
+const suggestions = fb5.suggestions_vn || [];
+const analysisText = fb5.analysis_full || '';
+const structureText = fb5.structure_breakdown || '';
 
 document.getElementById('tab-topic5').innerHTML = `
   <div class="bg-gradient-to-r from-pink-50 to-pink-100 p-5 rounded-xl">
@@ -662,18 +614,12 @@ document.getElementById('tab-topic5').innerHTML = `
       
       <div class="space-y-4">
         <div>
-          <h6 class="font-semibold text-gray-700">Phân tích đề (Score: <span class="text-blue-600">${fb5.analysis_score || 0}/10</span>)</h6>
-          <textarea id="t5-analysis-full" class="editable w-full mt-2" rows="6">SS: ${analysisFb.ss_correct ? '✅' : '❌'} - ${analysisFb.ss_comment || ''}
-IS: ${analysisFb.is_correct ? '✅' : '❌'} - ${analysisFb.is_comment || ''}
-Q: ${analysisFb.q_correct ? '✅' : '❌'} - ${analysisFb.q_comment || ''}
-T: ${analysisFb.t_correct ? '✅' : '❌'} - ${analysisFb.t_comment || ''}
-Outline Score: ${analysisFb.outline_score || 0}/2 - ${analysisFb.outline_comment || ''}
-
-Overall: ${vnFeedback.summary || fb5.overall_comment || ''}</textarea>
+          <h6 class="font-semibold text-gray-700">Phân tích đề</h6>
+          <textarea id="t5-analysis-full" class="editable w-full mt-2" rows="6">${analysisText}</textarea>
         </div>
 
         <div>
-          <h6 class="font-semibold text-gray-700">Mở bài (Score: <span class="text-blue-600">${fb5.introduction_score || 0}/10</span>) | CEFR: <span class="text-purple-600">${fb5.cefr_level || 'N/A'}</span></h6>
+          <h6 class="font-semibold text-gray-700">Mở bài</h6>
           
           <div>
             <strong>Điểm mạnh & Điểm yếu:</strong>
@@ -686,11 +632,7 @@ ${weaknessesVN.map(w => `• ${w}`).join('\n') || '• Chưa có'}</textarea>
 
           <div class="mt-3">
             <strong>Breakdown điểm số chi tiết:</strong>
-            <textarea id="t5-structure" class="editable w-full mt-2" rows="5">Background (Nền/Bối cảnh): ${introFb.structure_breakdown?.background || 0}/1
-Paraphrase (Diễn đạt lại đề): ${introFb.structure_breakdown?.paraphrase || 0}/1.5
-Thesis (Câu chủ đề/Quan điểm): ${introFb.structure_breakdown?.thesis || 0}/2
-General (Tổng quan/Chuyển ý): ${introFb.structure_breakdown?.general || 0}/0.5
-Word Count (Số từ): ${introFb.word_count_score || 0}/1 (${introFb.word_count || 0} words)</textarea>
+            <textarea id="t5-structure" class="editable w-full mt-2" rows="5">${structureText}</textarea>
           </div>
         </div>
 
@@ -762,6 +704,16 @@ function exportPDF() {
   const studentName = document.getElementById('detailName').textContent.trim();
   const printWin = window.open('', '_blank');
 
+  const topics = ['topic1', 'topic2', 'topic3', 'topic4', 'topic5'];
+  const topicTitles = [
+    'TOPIC 1 – APPEARANCE & SOCIETY',
+    'TOPIC 2 – STUDENTS & SCHOOL DECISIONS',
+    'TOPIC 3 – TECHNOLOGY & HAPPINESS',
+    'TOPIC 4 – OPPORTUNITIES FOR YOUNG PEOPLE',
+    'TOPIC 5 – PRACTICAL LIFE SKILLS'
+  ];
+  const topicColors = ['topic1', 'topic2', 'topic3', 'topic4', 'topic5'];
+
   printWin.document.write(`
 <!DOCTYPE html>
 <html lang="vi">
@@ -769,51 +721,92 @@ function exportPDF() {
 <meta charset="UTF-8">
 <title>FCE Feedback - ${studentName}</title>
 <style>
-  body {
-    font-family: "Segoe UI", Arial, sans-serif;
+  * {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
+  }
+  
+  @page {
+    size: A4;
+    margin: 1.5cm;  /* ✅ LỀ 1.5CM */
+  }
+  
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
     color: #1f2937;
     line-height: 1.6;
     background: white;
+    font-size: 13pt;
   }
-  .page {
-    page-break-after: always;
-    padding: 2cm 1.5cm 1.5cm 1.5cm;   /* trên 2cm, trái-phải-dưới 1.5cm */
-    min-height: 29.7cm;
-    position: relative;
-  }
-  .page:last-child { page-break-after: avoid; }
 
-  .header {
+  /* ===== TABLE LAYOUT ĐỂ HEADER/FOOTER TỰ ĐỘNG ===== */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  thead {
+    display: table-header-group;  /* ✅ TỰ ĐỘNG LẶP LẠI MỌI TRANG */
+  }
+  
+  tfoot {
+    display: table-footer-group;  /* ✅ TỰ ĐỘNG LẶP LẠI MỌI TRANG */
+  }
+  
+  tbody {
+    display: table-row-group;
+  }
+
+  /* ===== HEADER ===== */
+  .page-header {
     text-align: center;
-    margin-bottom: 20px;
-    padding-bottom: 12px;
-    border-bottom: 3px solid #10b981;
+    padding-bottom: 0.3cm;
+    border-bottom: 2px solid #10b981;
   }
-  .header img {
-    height: 80px;
-    margin-bottom: 8px;
+  .page-header img {
+    height: 35px;
+    margin-bottom: 0.2cm;
   }
-  .header h1 {
+  .page-header p {
+    font-size: 9pt;
+    color: #374151;
+    line-height: 1.2;
+  }
+
+  /* ===== FOOTER ===== */
+  .page-footer {
+    text-align: center;
+    font-size: 9pt;
+    color: #6b7280;
+    border-top: 1px solid #e5e7eb;
+    padding-top: 0.3cm;
+  }
+
+  /* ===== TIÊU ĐỀ CHÍNH (CHỈ TRANG 1) ===== */
+  .main-title {
+    text-align: center;
+    margin: 0.5cm 0 0.6cm 0;
+  }
+  .main-title h1 {
     font-size: 18pt;
     font-weight: bold;
     color: #065f46;
-    margin: 8px 0 4px 0;
+    margin-bottom: 0.2cm;
   }
-  .header p {
-    font-size: 12pt;
+  .main-title p {
+    font-size: 11pt;
     color: #374151;
-    margin: 4px 0;
   }
 
+  /* ===== TOPIC TITLE ===== */
   .topic-title {
-    font-size: 16pt;
+    font-size: 14pt;
     font-weight: bold;
     color: white;
-    padding: 10px 16px;
-    border-radius: 8px;
-    margin: 25px 0 15px 0;
+    padding: 7px 12px;
+    border-radius: 5px;
+    margin: 0.6cm 0 0.3cm 0;
     display: inline-block;
   }
   .topic1 { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
@@ -823,94 +816,122 @@ function exportPDF() {
   .topic5 { background: linear-gradient(135deg, #ec4899, #db2777); }
   .stats { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
 
+  /* ===== SECTION ===== */
   .section {
-    margin: 16px 0;
+    margin: 0.3cm 0;
     background: #fffbeb;
-    padding: 16px;
-    border-radius: 8px;
-    border-left: 6px solid #f59e0b;
-    font-size: 12pt;
+    padding: 0.35cm 0.4cm;
+    border-radius: 5px;
+    border-left: 3px solid #f59e0b;
   }
   .section h3 {
-    font-size: 14pt;
-    margin: 0 0 10px 0;
+    font-size: 12pt;
+    margin-bottom: 0.25cm;
     color: #92400e;
-    font-weight: bold;
+    font-weight: 600;
   }
-  pre {
+  .section pre {
     white-space: pre-wrap;
     font-family: inherit;
-    margin: 0;
     font-size: 12pt;
-    line-height: 1.7;
-  }
-
-  .footer {
-    position: absolute;
-    bottom: 1cm;
-    left: 1.5cm;
-    right: 1.5cm;
-    text-align: center;
-    font-size: 10pt;
-    color: #6b7280;
-    border-top: 1px solid #e5e7eb;
-    padding-top: 8px;
-  }
-
-  @page {
-    size: A4;
+    line-height: 1.5;
     margin: 0;
   }
+
   @media print {
-    body { padding: 0; }
-    .page { box-shadow: none; padding: 2cm 1.5cm 1.5cm 1.5cm; }
+    body { 
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
   }
 </style>
 </head>
 <body>
 
-<div class="page">
-  <div class="header">
-    <img src="https://gofirst.pro/images/uploads/62/baseimg/logo_16541442053.png" alt="LIME Logo">
-    <h1>FCE WRITING – FEEDBACK REPORT</h1>
-    <p><strong>${studentName}</strong> • Week ${currentWeek} • ${new Date().toLocaleDateString('vi-VN')}</p>
-    <p>Hotline: 090 123 4567 • Email: info@limeenglish.vn</p>
-  </div>
+<table>
+  <!-- ✅ HEADER (LẶP LẠI MỌI TRANG) -->
+  <thead>
+    <tr>
+      <td>
+        <div class="page-header">
+          <img src="https://gofirst.pro/images/uploads/62/baseimg/logo_16541442053.png" alt="LIME">
+          <p>Hotline: 0976222792 • Email: info.limeschool@gmail.com</p>
+        </div>
+      </td>
+    </tr>
+  </thead>
 
-  ${genTopic('topic1', 'TOPIC 1 – APPEARANCE & SOCIETY', 'topic1')}
-  ${genTopic('topic2', 'TOPIC 2 – STUDENTS & SCHOOL DECISIONS', 'topic2')}
-  ${genTopic('topic3', 'TOPIC 3 – TECHNOLOGY & HAPPINESS', 'topic3')}
-  ${genTopic('topic4', 'TOPIC 4 – OPPORTUNITIES FOR YOUNG PEOPLE', 'topic4')}
-  ${genTopic('topic5', 'TOPIC 5 – PRACTICAL LIFE SKILLS', 'topic5')}
+  <!-- ✅ FOOTER (LẶP LẠI MỌI TRANG) -->
+  <tfoot>
+    <tr>
+      <td>
+        <div class="page-footer">
+          LIME English Center • Địa chỉ: Yên Hòa - Mỹ Đình, Hà Nội • www.lime.edu.vn
+        </div>
+      </td>
+    </tr>
+  </tfoot>
 
-  <div style="margin-top:30px">
-    <div class="topic-title stats">THỐNG KÊ HOẠT ĐỘNG</div>
-    <div class="section"><pre>${document.getElementById('tab-stats').innerText.trim()}</pre></div>
-  </div>
+  <!-- ✅ NỘI DUNG CHÍNH -->
+  <tbody>
+    <tr>
+      <td>
+        <!-- TIÊU ĐỀ CHÍNH (CHỈ TRANG 1) -->
+        <div class="main-title">
+          <h1>FCE WRITING – FEEDBACK REPORT</h1>
+          <p><strong>${studentName}</strong> • Week ${currentWeek} • ${new Date().toLocaleDateString('vi-VN')}</p>
+        </div>
 
-  <div class="footer">
-    LIME English Center • Địa chỉ: 123 Đường ABC, Quận 1, TP.HCM • www.limeenglish.vn
-  </div>
-</div>
+        <!-- NỘI DUNG CÁC TOPIC -->
+        ${topics.map((topic, index) => generateTopic(index)).join('')}
+
+        <!-- STATISTICS -->
+        <div class="topic-title stats">THỐNG KÊ HOẠT ĐỘNG</div>
+        <div class="section">
+          <pre>${document.getElementById('tab-stats')?.innerText.trim() || 'Không có dữ liệu'}</pre>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
 
 </body>
 </html>
 `);
 
-  function genTopic(id, title, cls) {
-    const raw = document.getElementById('tab-' + id).innerHTML
-      .replace(/<textarea/g, '<pre')
-      .replace(/<\/textarea>/g, '</pre>')
-      .replace(/contenteditable="true"/g, '')
-      .replace(/class="editable[^"]*"/g, ''); // bỏ class lằng nhằng
-
-    return `
-    <div class="topic-title ${cls}">${title}</div>
-    <div style="margin-bottom:25px">${raw}</div>`;
+  function generateTopic(index) {
+    const tabId = topics[index];
+    const title = topicTitles[index];
+    const colorClass = topicColors[index];
+    const tab = document.getElementById('tab-' + tabId);
+    
+    if (!tab) return '';
+    
+    const textareas = tab.querySelectorAll('textarea.editable');
+    let html = `<div class="topic-title ${colorClass}">${title}</div>`;
+    
+    textareas.forEach(textarea => {
+      let label = 'Nội dung';
+      const prevElement = textarea.previousElementSibling;
+      if (prevElement && prevElement.tagName === 'STRONG') {
+        label = prevElement.textContent;
+      } else if (prevElement?.querySelector) {
+        const strong = prevElement.querySelector('strong');
+        if (strong) label = strong.textContent;
+      }
+      
+      html += `
+        <div class="section">
+          <h3>${label}</h3>
+          <pre>${textarea.value}</pre>
+        </div>`;
+    });
+    
+    return html;
   }
 
   printWin.document.close();
-  setTimeout(() => printWin.print(), 1000);
+  setTimeout(() => printWin.print(), 500);
 }
 
 function saveEditedFeedback() {
