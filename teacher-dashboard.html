@@ -6,6 +6,8 @@
   <title>Teacher Dashboard - FCE Writing - LIME</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/docx@7.8.2/build/index.js"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
   <style>
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%); }
     .fade-in { animation: fadeIn 0.5s ease-in; }
@@ -130,13 +132,16 @@
 
     <!-- Nút hành động -->
     <div class="flex gap-3 mt-6">
-      <button onclick="saveEditedFeedback()" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-lg">
-        Lưu Feedback Đã Sửa
-      </button>
-      <button onclick="exportPDF()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg">
-        Export PDF
-      </button>
-    </div>
+     <button onclick="saveEditedFeedback()" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-lg">
+       Lưu Feedback Đã Sửa
+     </button>
+     <button onclick="exportDOCX()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg">
+       📥 Export DOCX
+     </button>
+     <button onclick="exportPDF()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg">
+       Export PDF
+     </button>
+   </div>
   </div>
 
 </div>
@@ -240,20 +245,25 @@
     document.getElementById('tab-stats').innerHTML = '<div class="spinner"></div>';
 
     fetch(`${GOOGLE_SCRIPT_URL}?action=getStudentDetail&code=${code}&week=${currentWeek}`)
-      .then(r => r.json())
-      .then(data => {
-        if (data.status === 'success') {
-          renderStudentDetail(data);
-        } else {
-          alert('Không tìm thấy bài làm');
-        }
-      })
-      .catch(err => {
-        console.error(err);
-        alert('Lỗi kết nối');
-      });
-  }
-
+  .then(r => r.json())
+  .then(data => {
+    console.log('=== RAW API RESPONSE ===');
+    console.log('Full response:', data);
+    console.log('feedbackSource:', data.feedbackSource);
+    console.log('aiFeedback exists:', !!data.aiFeedback);
+    console.log('teacherFeedback exists:', !!data.teacherFeedback);
+    
+    if (data.status === 'success') {
+      renderStudentDetail(data);
+    } else {
+      alert('Không tìm thấy bài làm');
+    }
+  })
+  .catch(err => {
+    console.error('Fetch error:', err);
+    alert('Lỗi kết nối');
+  });
+} 
   function renderStudentDetail(data) {
     const work = data.work;
     const name = work.studentName || 'Unknown';
@@ -266,29 +276,63 @@ const t3 = work.topic3;
 const t4 = work.topic4;
 const t5 = work.topic5;
 
- console.log('===== DEBUG TOPICS =====');
-    console.log('Topic 1 SS:', t1?.ss);
-    console.log('Topic 2 SS:', t2?.ss);
-    console.log('Topic 3 SS:', t3?.ss);
-    console.log('Topic 4 SS:', t4?.ss);
-    console.log('Topic 5 SS:', t5?.ss);
-    console.log('AI Feedback:', data.aiFeedback);
-    console.log('Teacher Feedback:', data.teacherFeedback);
+console.log('===== DEBUG TOPICS =====');
+console.log('Topic 1 SS:', t1?.ss);
+console.log('AI Feedback:', data.aiFeedback);
+console.log('Teacher Feedback:', data.teacherFeedback);
+
+// ===== HÀM HELPER ĐỂ LẤY FEEDBACK =====
+function getFeedback(topicNum) {
+  const topicKey = `topic${topicNum}`;
+  
+  // Ưu tiên Teacher Feedback
+  if (data.teacherFeedback?.[topicKey]) {
+    const tf = data.teacherFeedback[topicKey];
+    return {
+      analysis_full: tf.analysis_full || '',
+      strengths_vn: Array.isArray(tf.strengths_vn) ? tf.strengths_vn : 
+                    (typeof tf.strengths_vn === 'string' ? JSON.parse(tf.strengths_vn || '[]') : []),
+      weaknesses_vn: Array.isArray(tf.weaknesses_vn) ? tf.weaknesses_vn : 
+                     (typeof tf.weaknesses_vn === 'string' ? JSON.parse(tf.weaknesses_vn || '[]') : []),
+      structure_breakdown: tf.structure_breakdown || '',
+      suggestions_vn: Array.isArray(tf.suggestions_vn) ? tf.suggestions_vn : 
+                      (typeof tf.suggestions_vn === 'string' ? JSON.parse(tf.suggestions_vn || '[]') : [])
+    };
+  }
+  
+  // Fallback: Dùng AI Feedback
+  if (data.aiFeedback?.[topicKey]) {
+    const ai = data.aiFeedback[topicKey];
+    const vn = ai.vietnamese_feedback || {};
+    const intro = ai.introduction_feedback || {};
+    const analysis = ai.analysis_feedback || {};
+    
+    return {
+      analysis_full: vn.summary || analysis.outline_comment || '',
+      strengths_vn: intro.strengths || [],
+      weaknesses_vn: intro.weaknesses || [],
+      structure_breakdown: JSON.stringify(intro.structure_breakdown || {}, null, 2),
+      suggestions_vn: vn.suggestions_vn || ai.improvement_suggestions || []
+    };
+  }
+  
+  // Không có gì cả
+  return {
+    analysis_full: '',
+    strengths_vn: [],
+    weaknesses_vn: [],
+    structure_breakdown: '',
+    suggestions_vn: []
+  };
+}
 
 // === ĐỀ 1 ===
 {
-const fb1 = data.teacherFeedback?.topic1 || data.aiFeedback?.topic1 || {};
-
-// ✅ ĐƠN GIẢN: Lấy trực tiếp từ feedback đã lưu
-const strengthsVN = fb1.strengths_vn || [];
-const weaknessesVN = fb1.weaknesses_vn || [];
-const suggestions = fb1.suggestions_vn || [];
-const analysisText = fb1.analysis_full || '';
-const structureText = fb1.structure_breakdown || '';
+const fb1 = getFeedback(1);
 
 document.getElementById('tab-topic1').innerHTML = `
   <div class="bg-gradient-to-r from-blue-50 to-blue-100 p-5 rounded-xl">
-    <h4 class="font-bold text-blue-800 mb-3">ĐỀ 1: ${t1.title || 'APPEARANCE & SOCIETY'}</h4>
+    <h4 class="font-bold text-blue-800 mb-3">Đề 1: ${t1.title || 'APPEARANCE & SOCIETY'}</h4>
     <p class="text-sm italic mb-4">"${t1.prompt || '...'}"</p>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -319,32 +363,33 @@ document.getElementById('tab-topic1').innerHTML = `
       <div class="space-y-4">
         <!-- Analysis Feedback -->
         <div>
-  <h6 class="font-semibold text-gray-700">Phân tích đề</h6>
-  <textarea id="t1-analysis-full" class="editable w-full mt-2" rows="6">${analysisText}</textarea>
-</div>
+          <h6 class="font-semibold text-gray-700">Phân tích đề</h6>
+          <textarea id="t1-analysis-full" class="editable w-full mt-2" rows="6">${fb1.analysis_full}</textarea>
+        </div>
 
         <!-- Introduction Feedback -->
-       <div>
-  <h6 class="font-semibold text-gray-700">Mở bài</h6>
-  
-  <div>
-    <strong>Điểm mạnh & Điểm yếu:</strong>
-    <textarea id="t1-strengths-weaknesses" class="editable w-full mt-2" rows="8">ĐIỂM MẠNH:
-${strengthsVN.map(s => `• ${s}`).join('\n') || '• Chưa có'}
+        <div>
+          <h6 class="font-semibold text-gray-700">Mở bài</h6>
+          
+          <div>
+            <strong>Điểm mạnh & Điểm yếu:</strong>
+            <textarea id="t1-strengths-weaknesses" class="editable w-full mt-2" rows="8">ĐIỂM MẠNH:
+${fb1.strengths_vn.map(s => `• ${s}`).join('\n') || '• Chưa có'}
 
 ĐIỂM YẾU:
-${weaknessesVN.map(w => `• ${w}`).join('\n') || '• Chưa có'}</textarea>
-  </div>
+${fb1.weaknesses_vn.map(w => `• ${w}`).join('\n') || '• Chưa có'}</textarea>
+          </div>
 
-  <div class="mt-3">
-    <strong>Breakdown điểm số chi tiết:</strong>
-    <textarea id="t1-structure" class="editable w-full mt-2" rows="5">${structureText}</textarea>
-  </div>
-</div>
+          <div class="mt-3">
+            <strong>Breakdown điểm số chi tiết:</strong>
+            <textarea id="t1-structure" class="editable w-full mt-2" rows="5">${fb1.structure_breakdown}</textarea>
+          </div>
+        </div>
+
         <!-- Suggestions -->
         <div>
           <h6 class="font-semibold text-gray-700">Gợi ý cải thiện:</h6>
-          <textarea id="t1-suggestions" class="editable w-full mt-2" rows="6">${suggestions.map(s => `• ${s}`).join('\n') || '• Chưa có'}</textarea>
+          <textarea id="t1-suggestions" class="editable w-full mt-2" rows="6">${fb1.suggestions_vn.map(s => `• ${s}`).join('\n') || '• Chưa có'}</textarea>
         </div>
       </div>
     </div>
@@ -354,22 +399,14 @@ ${weaknessesVN.map(w => `• ${w}`).join('\n') || '• Chưa có'}</textarea>
 
 // === ĐỀ 2 ===
 {
-const fb2 = data.teacherFeedback?.topic2 || data.aiFeedback?.topic2 || {};
-
-// ✅ ĐƠN GIẢN: Lấy trực tiếp từ feedback đã lưu
-const strengthsVN = fb2.strengths_vn || [];
-const weaknessesVN = fb2.weaknesses_vn || [];
-const suggestions = fb2.suggestions_vn || [];
-const analysisText = fb2.analysis_full || '';
-const structureText = fb2.structure_breakdown || '';
+const fb2 = getFeedback(2);
 
 document.getElementById('tab-topic2').innerHTML = `
   <div class="bg-gradient-to-r from-green-50 to-green-100 p-5 rounded-xl">
-    <h4 class="font-bold text-green-800 mb-3">ĐỀ 2: ${t2.title || 'STUDENTS & SCHOOL DECISIONS'}</h4>
+    <h4 class="font-bold text-green-800 mb-3">Đề 2: ${t2.title || 'STUDENTS & SCHOOL DECISIONS'}</h4>
     <p class="text-sm italic mb-4">"${t2.prompt || 'Students should help to make decisions about what happens at school'}"</p>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <!-- Phân tích -->
       <div class="bg-white p-4 rounded-lg shadow">
         <h5 class="font-bold text-green-700 mb-2">PHÂN TÍCH ĐỀ</h5>
         <div class="space-y-1 text-sm">
@@ -381,7 +418,6 @@ document.getElementById('tab-topic2').innerHTML = `
         <p class="mt-2"><strong>Outline:</strong> ${[t2.body1, t2.body2, t2.body3].filter(x=>x).join(' → ') || '—'}</p>
       </div>
 
-      <!-- Mở bài -->
       <div class="bg-white p-4 rounded-lg shadow">
         <h5 class="font-bold text-purple-700 mb-2">MỞ BÀI</h5>
         <p class="text-sm bg-gray-50 p-3 rounded">${t2.introduction || '—'}</p>
@@ -389,40 +425,36 @@ document.getElementById('tab-topic2').innerHTML = `
       </div>
     </div>
 
-    <!-- Feedback Chi Tiết -->
     <div class="mt-6 bg-yellow-50 p-4 rounded-lg">
       <h5 class="font-bold text-yellow-800 mb-2">NHẬN XÉT & ĐÁNH GIÁ</h5>
       
       <div class="space-y-4">
-        <!-- Analysis Feedback -->
         <div>
           <h6 class="font-semibold text-gray-700">Phân tích đề</h6>
-          <textarea id="t2-analysis-full" class="editable w-full mt-2" rows="6">${analysisText}</textarea>
+          <textarea id="t2-analysis-full" class="editable w-full mt-2" rows="6">${fb2.analysis_full}</textarea>
         </div>
 
-        <!-- Introduction Feedback -->
         <div>
           <h6 class="font-semibold text-gray-700">Mở bài</h6>
           
           <div>
             <strong>Điểm mạnh & Điểm yếu:</strong>
             <textarea id="t2-strengths-weaknesses" class="editable w-full mt-2" rows="8">ĐIỂM MẠNH:
-${strengthsVN.map(s => `• ${s}`).join('\n') || '• Chưa có'}
+${fb2.strengths_vn.map(s => `• ${s}`).join('\n') || '• Chưa có'}
 
 ĐIỂM YẾU:
-${weaknessesVN.map(w => `• ${w}`).join('\n') || '• Chưa có'}</textarea>
+${fb2.weaknesses_vn.map(w => `• ${w}`).join('\n') || '• Chưa có'}</textarea>
           </div>
 
           <div class="mt-3">
             <strong>Breakdown điểm số chi tiết:</strong>
-            <textarea id="t2-structure" class="editable w-full mt-2" rows="5">${structureText}</textarea>
+            <textarea id="t2-structure" class="editable w-full mt-2" rows="5">${fb2.structure_breakdown}</textarea>
           </div>
         </div>
 
-        <!-- Suggestions -->
         <div>
           <h6 class="font-semibold text-gray-700">Gợi ý cải thiện:</h6>
-          <textarea id="t2-suggestions" class="editable w-full mt-2" rows="6">${suggestions.map(s => `• ${s}`).join('\n') || '• Chưa có'}</textarea>
+          <textarea id="t2-suggestions" class="editable w-full mt-2" rows="6">${fb2.suggestions_vn.map(s => `• ${s}`).join('\n') || '• Chưa có'}</textarea>
         </div>
       </div>
     </div>
@@ -430,23 +462,20 @@ ${weaknessesVN.map(w => `• ${w}`).join('\n') || '• Chưa có'}</textarea>
 `;
 }
 
+// === ĐỀ 3, 4, 5 tương tự ===
+// (Copy pattern của topic 2, thay t3, t4, t5)
+
 // === ĐỀ 3 ===
 {
-const fb3 = data.teacherFeedback?.topic3 || data.aiFeedback?.topic3 || {};
-
-// ✅ ĐƠN GIẢN: Lấy trực tiếp từ feedback đã lưu
-const strengthsVN = fb3.strengths_vn || [];
-const weaknessesVN = fb3.weaknesses_vn || [];
-const suggestions = fb3.suggestions_vn || [];
-const analysisText = fb3.analysis_full || '';
-const structureText = fb3.structure_breakdown || '';
+const fb3 = getFeedback(3);
 
 document.getElementById('tab-topic3').innerHTML = `
   <div class="bg-gradient-to-r from-teal-50 to-teal-100 p-5 rounded-xl">
-    <h4 class="font-bold text-teal-800 mb-3">ĐỀ 3: ${t3.title || 'TECHNOLOGY & HAPPINESS'}</h4>
+    <h4 class="font-bold text-teal-800 mb-3">Đề 3: ${t3.title || 'TECHNOLOGY & HAPPINESS'}</h4>
     <p class="text-sm italic mb-4">"${t3.prompt || 'Technology has made our lives easier but has it made us happier?'}"</p>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Phân tích -->
       <div class="bg-white p-4 rounded-lg shadow">
         <h5 class="font-bold text-green-700 mb-2">PHÂN TÍCH ĐỀ</h5>
         <div class="space-y-1 text-sm">
@@ -458,6 +487,7 @@ document.getElementById('tab-topic3').innerHTML = `
         <p class="mt-2"><strong>Outline:</strong> ${[t3.body1, t3.body2, t3.body3].filter(x=>x).join(' → ') || '—'}</p>
       </div>
 
+      <!-- Mở bài -->
       <div class="bg-white p-4 rounded-lg shadow">
         <h5 class="font-bold text-purple-700 mb-2">MỞ BÀI</h5>
         <p class="text-sm bg-gray-50 p-3 rounded">${t3.introduction || '—'}</p>
@@ -465,36 +495,40 @@ document.getElementById('tab-topic3').innerHTML = `
       </div>
     </div>
 
+    <!-- Feedback Chi Tiết -->
     <div class="mt-6 bg-yellow-50 p-4 rounded-lg">
       <h5 class="font-bold text-yellow-800 mb-2">NHẬN XÉT & ĐÁNH GIÁ</h5>
       
       <div class="space-y-4">
+        <!-- Analysis Feedback -->
         <div>
           <h6 class="font-semibold text-gray-700">Phân tích đề</h6>
-          <textarea id="t3-analysis-full" class="editable w-full mt-2" rows="6">${analysisText}</textarea>
+          <textarea id="t3-analysis-full" class="editable w-full mt-2" rows="6">${fb3.analysis_full}</textarea>
         </div>
 
+        <!-- Introduction Feedback -->
         <div>
           <h6 class="font-semibold text-gray-700">Mở bài</h6>
           
           <div>
             <strong>Điểm mạnh & Điểm yếu:</strong>
             <textarea id="t3-strengths-weaknesses" class="editable w-full mt-2" rows="8">ĐIỂM MẠNH:
-${strengthsVN.map(s => `• ${s}`).join('\n') || '• Chưa có'}
+${fb3.strengths_vn.map(s => `• ${s}`).join('\n') || '• Chưa có'}
 
 ĐIỂM YẾU:
-${weaknessesVN.map(w => `• ${w}`).join('\n') || '• Chưa có'}</textarea>
+${fb3.weaknesses_vn.map(w => `• ${w}`).join('\n') || '• Chưa có'}</textarea>
           </div>
 
           <div class="mt-3">
             <strong>Breakdown điểm số chi tiết:</strong>
-            <textarea id="t3-structure" class="editable w-full mt-2" rows="5">${structureText}</textarea>
+            <textarea id="t3-structure" class="editable w-full mt-2" rows="5">${fb3.structure_breakdown}</textarea>
           </div>
         </div>
 
+        <!-- Suggestions -->
         <div>
           <h6 class="font-semibold text-gray-700">Gợi ý cải thiện:</h6>
-          <textarea id="t3-suggestions" class="editable w-full mt-2" rows="6">${suggestions.map(s => `• ${s}`).join('\n') || '• Chưa có'}</textarea>
+          <textarea id="t3-suggestions" class="editable w-full mt-2" rows="6">${fb3.suggestions_vn.map(s => `• ${s}`).join('\n') || '• Chưa có'}</textarea>
         </div>
       </div>
     </div>
@@ -504,21 +538,15 @@ ${weaknessesVN.map(w => `• ${w}`).join('\n') || '• Chưa có'}</textarea>
 
 // === ĐỀ 4 ===
 {
-const fb4 = data.teacherFeedback?.topic4 || data.aiFeedback?.topic4 || {};
-
-// ✅ ĐƠN GIẢN: Lấy trực tiếp từ feedback đã lưu
-const strengthsVN = fb4.strengths_vn || [];
-const weaknessesVN = fb4.weaknesses_vn || [];
-const suggestions = fb4.suggestions_vn || [];
-const analysisText = fb4.analysis_full || '';
-const structureText = fb4.structure_breakdown || '';
+const fb4 = getFeedback(4);
 
 document.getElementById('tab-topic4').innerHTML = `
   <div class="bg-gradient-to-r from-orange-50 to-orange-100 p-5 rounded-xl">
-    <h4 class="font-bold text-orange-800 mb-3">ĐỀ 4: ${t4.title || 'OPPORTUNITIES FOR YOUNG PEOPLE'}</h4>
+    <h4 class="font-bold text-orange-800 mb-3">Đề 4: ${t4.title || 'OPPORTUNITIES FOR YOUNG PEOPLE'}</h4>
     <p class="text-sm italic mb-4">"${t4.prompt || 'Young people today have more opportunities than their parents\' generation'}"</p>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Phân tích -->
       <div class="bg-white p-4 rounded-lg shadow">
         <h5 class="font-bold text-green-700 mb-2">PHÂN TÍCH ĐỀ</h5>
         <div class="space-y-1 text-sm">
@@ -530,6 +558,7 @@ document.getElementById('tab-topic4').innerHTML = `
         <p class="mt-2"><strong>Outline:</strong> ${[t4.body1, t4.body2, t4.body3].filter(x=>x).join(' → ') || '—'}</p>
       </div>
 
+      <!-- Mở bài -->
       <div class="bg-white p-4 rounded-lg shadow">
         <h5 class="font-bold text-purple-700 mb-2">MỞ BÀI</h5>
         <p class="text-sm bg-gray-50 p-3 rounded">${t4.introduction || '—'}</p>
@@ -537,36 +566,40 @@ document.getElementById('tab-topic4').innerHTML = `
       </div>
     </div>
 
+    <!-- Feedback Chi Tiết -->
     <div class="mt-6 bg-yellow-50 p-4 rounded-lg">
       <h5 class="font-bold text-yellow-800 mb-2">NHẬN XÉT & ĐÁNH GIÁ</h5>
       
       <div class="space-y-4">
+        <!-- Analysis Feedback -->
         <div>
           <h6 class="font-semibold text-gray-700">Phân tích đề</h6>
-          <textarea id="t4-analysis-full" class="editable w-full mt-2" rows="6">${analysisText}</textarea>
+          <textarea id="t4-analysis-full" class="editable w-full mt-2" rows="6">${fb4.analysis_full}</textarea>
         </div>
 
+        <!-- Introduction Feedback -->
         <div>
           <h6 class="font-semibold text-gray-700">Mở bài</h6>
           
           <div>
             <strong>Điểm mạnh & Điểm yếu:</strong>
             <textarea id="t4-strengths-weaknesses" class="editable w-full mt-2" rows="8">ĐIỂM MẠNH:
-${strengthsVN.map(s => `• ${s}`).join('\n') || '• Chưa có'}
+${fb4.strengths_vn.map(s => `• ${s}`).join('\n') || '• Chưa có'}
 
 ĐIỂM YẾU:
-${weaknessesVN.map(w => `• ${w}`).join('\n') || '• Chưa có'}</textarea>
+${fb4.weaknesses_vn.map(w => `• ${w}`).join('\n') || '• Chưa có'}</textarea>
           </div>
 
           <div class="mt-3">
             <strong>Breakdown điểm số chi tiết:</strong>
-            <textarea id="t4-structure" class="editable w-full mt-2" rows="5">${structureText}</textarea>
+            <textarea id="t4-structure" class="editable w-full mt-2" rows="5">${fb4.structure_breakdown}</textarea>
           </div>
         </div>
 
+        <!-- Suggestions -->
         <div>
           <h6 class="font-semibold text-gray-700">Gợi ý cải thiện:</h6>
-          <textarea id="t4-suggestions" class="editable w-full mt-2" rows="6">${suggestions.map(s => `• ${s}`).join('\n') || '• Chưa có'}</textarea>
+          <textarea id="t4-suggestions" class="editable w-full mt-2" rows="6">${fb4.suggestions_vn.map(s => `• ${s}`).join('\n') || '• Chưa có'}</textarea>
         </div>
       </div>
     </div>
@@ -576,21 +609,15 @@ ${weaknessesVN.map(w => `• ${w}`).join('\n') || '• Chưa có'}</textarea>
 
 // === ĐỀ 5 ===
 {
-const fb5 = data.teacherFeedback?.topic5 || data.aiFeedback?.topic5 || {};
-
-// ✅ ĐƠN GIẢN: Lấy trực tiếp từ feedback đã lưu
-const strengthsVN = fb5.strengths_vn || [];
-const weaknessesVN = fb5.weaknesses_vn || [];
-const suggestions = fb5.suggestions_vn || [];
-const analysisText = fb5.analysis_full || '';
-const structureText = fb5.structure_breakdown || '';
+const fb5 = getFeedback(5);
 
 document.getElementById('tab-topic5').innerHTML = `
   <div class="bg-gradient-to-r from-pink-50 to-pink-100 p-5 rounded-xl">
-    <h4 class="font-bold text-pink-800 mb-3">ĐỀ 5: ${t5.title || 'PRACTICAL LIFE SKILLS IN SCHOOLS'}</h4>
+    <h4 class="font-bold text-pink-800 mb-3">Đề 5: ${t5.title || 'PRACTICAL LIFE SKILLS IN SCHOOLS'}</h4>
     <p class="text-sm italic mb-4">"${t5.prompt || 'Schools should teach practical life skills rather than just academic subjects'}"</p>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Phân tích -->
       <div class="bg-white p-4 rounded-lg shadow">
         <h5 class="font-bold text-green-700 mb-2">PHÂN TÍCH ĐỀ</h5>
         <div class="space-y-1 text-sm">
@@ -602,6 +629,7 @@ document.getElementById('tab-topic5').innerHTML = `
         <p class="mt-2"><strong>Outline:</strong> ${[t5.body1, t5.body2, t5.body3].filter(x=>x).join(' → ') || '—'}</p>
       </div>
 
+      <!-- Mở bài -->
       <div class="bg-white p-4 rounded-lg shadow">
         <h5 class="font-bold text-purple-700 mb-2">MỞ BÀI</h5>
         <p class="text-sm bg-gray-50 p-3 rounded">${t5.introduction || '—'}</p>
@@ -609,36 +637,40 @@ document.getElementById('tab-topic5').innerHTML = `
       </div>
     </div>
 
+    <!-- Feedback Chi Tiết -->
     <div class="mt-6 bg-yellow-50 p-4 rounded-lg">
       <h5 class="font-bold text-yellow-800 mb-2">NHẬN XÉT & ĐÁNH GIÁ</h5>
       
       <div class="space-y-4">
+        <!-- Analysis Feedback -->
         <div>
           <h6 class="font-semibold text-gray-700">Phân tích đề</h6>
-          <textarea id="t5-analysis-full" class="editable w-full mt-2" rows="6">${analysisText}</textarea>
+          <textarea id="t5-analysis-full" class="editable w-full mt-2" rows="6">${fb5.analysis_full}</textarea>
         </div>
 
+        <!-- Introduction Feedback -->
         <div>
           <h6 class="font-semibold text-gray-700">Mở bài</h6>
           
           <div>
             <strong>Điểm mạnh & Điểm yếu:</strong>
             <textarea id="t5-strengths-weaknesses" class="editable w-full mt-2" rows="8">ĐIỂM MẠNH:
-${strengthsVN.map(s => `• ${s}`).join('\n') || '• Chưa có'}
+${fb5.strengths_vn.map(s => `• ${s}`).join('\n') || '• Chưa có'}
 
 ĐIỂM YẾU:
-${weaknessesVN.map(w => `• ${w}`).join('\n') || '• Chưa có'}</textarea>
+${fb5.weaknesses_vn.map(w => `• ${w}`).join('\n') || '• Chưa có'}</textarea>
           </div>
 
           <div class="mt-3">
             <strong>Breakdown điểm số chi tiết:</strong>
-            <textarea id="t5-structure" class="editable w-full mt-2" rows="5">${structureText}</textarea>
+            <textarea id="t5-structure" class="editable w-full mt-2" rows="5">${fb5.structure_breakdown}</textarea>
           </div>
         </div>
 
+        <!-- Suggestions -->
         <div>
           <h6 class="font-semibold text-gray-700">Gợi ý cải thiện:</h6>
-          <textarea id="t5-suggestions" class="editable w-full mt-2" rows="6">${suggestions.map(s => `• ${s}`).join('\n') || '• Chưa có'}</textarea>
+          <textarea id="t5-suggestions" class="editable w-full mt-2" rows="6">${fb5.suggestions_vn.map(s => `• ${s}`).join('\n') || '• Chưa có'}</textarea>
         </div>
       </div>
     </div>
@@ -646,7 +678,7 @@ ${weaknessesVN.map(w => `• ${w}`).join('\n') || '• Chưa có'}</textarea>
 `;
 }
 
-    // === Tab Statistics (Work statistics for 5 topics) ===
+// === Tab Statistics (giữ nguyên như cũ) ===
 document.getElementById('tab-stats').innerHTML = `
   <div class="bg-green-50 p-4 rounded-lg">
     <h5 class="font-bold text-green-700 mb-3">WORK STATISTICS</h5>
@@ -654,16 +686,17 @@ document.getElementById('tab-stats').innerHTML = `
       <p><strong>Total time:</strong> ${work.totalTime || '0m 0s'}</p>
       <p><strong>Topic 1 time:</strong> ${t1.timeUsed || '0m 0s'}</p>
       <p><strong>Topic 2 time:</strong> ${t2.timeUsed || '0m 0s'}</p>
-      <p><strong>Topic 3 time:</strong> ${work.topic3?.timeUsed || '0m 0s'}</p>
-      <p><strong>Topic 4 time:</strong> ${work.topic4?.timeUsed || '0m 0s'}</p>
-      <p><strong>Topic 5 time:</strong> ${work.topic5?.timeUsed || '0m 0s'}</p>
+      <p><strong>Topic 3 time:</strong> ${t3.timeUsed || '0m 0s'}</p>
+      <p><strong>Topic 4 time:</strong> ${t4.timeUsed || '0m 0s'}</p>
+      <p><strong>Topic 5 time:</strong> ${t5.timeUsed || '0m 0s'}</p>
       <p><strong>Total pastes:</strong> ${data.totalPastes || 0}</p>
       <p><strong>Total edits:</strong> ${data.totalEdits || 0}</p>
     </div>
   </div>
 `;
 
-  setTimeout(() => {
+// Auto resize textarea khi load xong
+setTimeout(() => {
   document.querySelectorAll('#tab-topic1 .editable').forEach(textarea => {
     textarea.style.height = 'auto';
     textarea.style.height = (textarea.scrollHeight + 10) + 'px';
@@ -697,6 +730,229 @@ document.getElementById('tab-stats').innerHTML = `
   function closeDetail() {
     document.getElementById('studentDetail').classList.add('hidden');
   }
+
+function exportDOCX() {
+  if (!currentStudent) return alert('Chọn học sinh trước!');
+  
+  // ✅ KIỂM TRA THƯ VIỆN ĐÃ LOAD CHƯA
+  if (typeof docx === 'undefined' || typeof saveAs === 'undefined') {
+    alert('⏳ Đang tải thư viện... Vui lòng đợi 3 giây và thử lại!');
+    console.error('docx:', typeof docx !== 'undefined' ? 'OK' : 'MISSING');
+    console.error('saveAs:', typeof saveAs !== 'undefined' ? 'OK' : 'MISSING');
+    return;
+  }
+  
+  try {
+    const studentName = document.getElementById('detailName').textContent.trim();
+    
+    function getValue(id) {
+      const el = document.getElementById(id);
+      return el ? el.value.trim() : 'Chưa có nội dung';
+    }
+
+    // ✅ LẤY DỮ LIỆU TỪ currentFeedback
+    const work = currentFeedback.work;
+    const topicsData = [
+      work.topic1,
+      work.topic2,
+      work.topic3,
+      work.topic4,
+      work.topic5
+    ];
+
+    const { Document, Paragraph, TextRun, HeadingLevel, AlignmentType, UnderlineType } = docx;
+    
+    const children = [];
+
+    // Header
+    children.push(
+      new Paragraph({
+        text: 'FCE WRITING – FEEDBACK REPORT',
+        heading: HeadingLevel.HEADING_1,
+        alignment: AlignmentType.CENTER,
+        spacing: { after: 200 }
+      }),
+      new Paragraph({
+        children: [
+          new TextRun({ text: studentName, bold: true }),
+          new TextRun({ text: ` • Week ${currentWeek} • ${new Date().toLocaleDateString('vi-VN')}` })
+        ],
+        alignment: AlignmentType.CENTER,
+        spacing: { after: 400 }
+      })
+    );
+
+    const topics = ['topic1', 'topic2', 'topic3', 'topic4', 'topic5'];
+    const topicTitles = [
+      'TOPIC 1 – APPEARANCE & SOCIETY',
+      'TOPIC 2 – STUDENTS & SCHOOL DECISIONS',
+      'TOPIC 3 – TECHNOLOGY & HAPPINESS',
+      'TOPIC 4 – OPPORTUNITIES FOR YOUNG PEOPLE',
+      'TOPIC 5 – PRACTICAL LIFE SKILLS'
+    ];
+
+    topics.forEach((topic, index) => {
+      const prefix = `t${index + 1}`;
+      const topicData = topicsData[index];
+      
+      // ============= TOPIC TITLE =============
+      children.push(
+        new Paragraph({ text: '', spacing: { before: 400 } }),
+        new Paragraph({
+          text: topicTitles[index],
+          heading: HeadingLevel.HEADING_2,
+          spacing: { after: 200 }
+        })
+      );
+
+      // ============= ĐỀ BÀI =============
+      children.push(
+        new Paragraph({
+          children: [new TextRun({ 
+            text: '📝 ĐỀ BÀI', 
+            bold: true, 
+            color: '1E40AF',
+            underline: { type: UnderlineType.SINGLE } 
+          })],
+          spacing: { before: 150, after: 100 }
+        }),
+        new Paragraph({
+          children: [new TextRun({ 
+            text: topicData.prompt || 'Không có đề bài',
+            italics: true,
+            color: '374151'
+          })],
+          spacing: { after: 200 },
+          border: {
+            top: { color: 'E5E7EB', space: 1, style: 'single', size: 6 },
+            bottom: { color: 'E5E7EB', space: 1, style: 'single', size: 6 },
+            left: { color: '3B82F6', space: 1, style: 'single', size: 24 },
+          },
+          shading: { fill: 'EFF6FF' }
+        })
+      );
+
+      // ============= MỞ BÀI CỦA HỌC SINH =============
+      children.push(
+        new Paragraph({
+          children: [new TextRun({ 
+            text: '✍️ MỞ BÀI CỦA HỌC SINH', 
+            bold: true, 
+            color: '7C3AED',
+            underline: { type: UnderlineType.SINGLE } 
+          })],
+          spacing: { before: 150, after: 100 }
+        }),
+        new Paragraph({
+          text: topicData.introduction || 'Chưa có mở bài',
+          spacing: { after: 100 },
+          border: {
+            top: { color: 'E5E7EB', space: 1, style: 'single', size: 6 },
+            bottom: { color: 'E5E7EB', space: 1, style: 'single', size: 6 },
+            left: { color: '8B5CF6', space: 1, style: 'single', size: 24 },
+          },
+          shading: { fill: 'FAF5FF' }
+        }),
+        new Paragraph({
+          children: [
+            new TextRun({ text: 'Số từ: ', color: '6B7280', size: 18 }),
+            new TextRun({ text: `${topicData.wordCount || 0}`, bold: true, color: '059669', size: 18 }),
+            new TextRun({ text: ' | Thời gian: ', color: '6B7280', size: 18 }),
+            new TextRun({ text: `${topicData.timeUsed || '0m 0s'}`, bold: true, color: 'D97706', size: 18 })
+          ],
+          spacing: { after: 250 }
+        })
+      );
+
+      // ============= PHÂN TÍCH ĐỀ BÀI =============
+      children.push(
+        new Paragraph({
+          children: [new TextRun({ text: '🎯 PHÂN TÍCH ĐỀ BÀI', bold: true, underline: { type: UnderlineType.SINGLE } })],
+          spacing: { before: 200, after: 100 }
+        }),
+        new Paragraph({
+          text: getValue(`${prefix}-analysis-full`),
+          spacing: { after: 200 }
+        })
+      );
+
+      // ============= MỞ BÀI - ĐIỂM MẠNH & YẾU =============
+      children.push(
+        new Paragraph({
+          children: [new TextRun({ text: '⭐ MỞ BÀI - ĐIỂM MẠNH & ĐIỂM YẾU', bold: true, underline: { type: UnderlineType.SINGLE } })],
+          spacing: { before: 200, after: 100 }
+        }),
+        new Paragraph({
+          text: getValue(`${prefix}-strengths-weaknesses`),
+          spacing: { after: 200 }
+        })
+      );
+
+      // ============= BREAKDOWN =============
+      children.push(
+        new Paragraph({
+          children: [new TextRun({ text: '📊 BREAKDOWN ĐIỂM SỐ CHI TIẾT', bold: true, underline: { type: UnderlineType.SINGLE } })],
+          spacing: { before: 200, after: 100 }
+        }),
+        new Paragraph({
+          text: getValue(`${prefix}-structure`),
+          spacing: { after: 200 }
+        })
+      );
+
+      // ============= GỢI Ý CẢI THIỆN =============
+      children.push(
+        new Paragraph({
+          children: [new TextRun({ text: '💡 GỢI Ý CẢI THIỆN', bold: true, underline: { type: UnderlineType.SINGLE } })],
+          spacing: { before: 200, after: 100 }
+        }),
+        new Paragraph({
+          text: getValue(`${prefix}-suggestions`),
+          spacing: { after: 300 }
+        })
+      );
+    });
+
+    // ============= STATISTICS =============
+    const statsText = document.getElementById('tab-stats')?.innerText.trim() || 'Không có dữ liệu';
+    children.push(
+      new Paragraph({ text: '', spacing: { before: 400 } }),
+      new Paragraph({
+        text: '📈 THỐNG KÊ HOẠT ĐỘNG',
+        heading: HeadingLevel.HEADING_2,
+        spacing: { after: 200 }
+      }),
+      new Paragraph({
+        text: statsText,
+        spacing: { after: 200 }
+      })
+    );
+
+    const doc = new Document({
+      sections: [{
+        properties: {
+          page: {
+            margin: { top: 1440, right: 1440, bottom: 1440, left: 1440 }
+          }
+        },
+        children: children
+      }]
+    });
+
+    // ✅ Export file
+    docx.Packer.toBlob(doc).then(blob => {
+      saveAs(blob, `FCE_Feedback_${currentStudent}_Week${currentWeek}.docx`);
+      alert('✅ Đã tải xuống file DOCX! Bạn có thể mở bằng Word để chỉnh sửa.');
+    }).catch(err => {
+      console.error('Lỗi export DOCX:', err);
+      alert('❌ Lỗi khi tạo file DOCX. Xem console để biết chi tiết.');
+    });
+
+  } catch (error) {
+    console.error('Lỗi export DOCX:', error);
+    alert('❌ Có lỗi xảy ra: ' + error.message);
+  }
+}
 
 function exportPDF() {
   if (!currentStudent) return alert('Chọn học sinh trước!');
